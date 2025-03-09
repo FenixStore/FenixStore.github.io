@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fenix Store</title>
+    <link rel="icon" type="image/png" href="img/fenixstorelogo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+    
+        body {
+            background: linear-gradient(135deg, #2d2d2d, #5c5c5c, #8a8a8a);
+            line-height: 1.6;
+            color: #333;
+        }
+    
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px;
+        }
+    
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+        }
+    
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+    
+        .logo {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+    
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+    
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+    
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+    
+        .search-bar {
+            margin-left: 20px;
+        }
+    
+        .search-bar input {
+            width: 200px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    
+        .home-section {
+            text-align: center;
+            padding: 60px 0;
+            position: relative;
+        }
+    
+        .banner {
+            position: relative;
+            max-width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+    
+        .banner-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+    
+        .banner-slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+    
+        .banner-slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            opacity: 0; /* Inicialmente invisible */
+            transition: opacity 0.3s ease; /* Transición suave */
+        }
+    
+        .banner-slide:hover::after {
+            opacity: 1; /* Aparece al pasar el cursor */
+        }
+    
+        .banner-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    
+        .banner-slide h3 {
+            position: absolute;
+            color: white;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 2;
+            opacity: 0; /* Inicialmente invisible */
+            transition: opacity 0.3s ease; /* Transición suave */
+        }
+    
+        .banner-slide:hover h3 {
+            opacity: 1; /* Aparece al pasar el cursor */
+        }
+    
+        .banner-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease, transform 0.3s ease;
+            z-index: 3;
+        }
+    
+        .banner-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+    
+        .banner-btn.prev {
+            left: 20px;
+        }
+    
+        .banner-btn.next {
+            right: 20px;
+        }
+    
+        .section-title {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+        }
+    
+        .featured-games, .new-games, .popular-games, .news, .ads, .games-grid, .noticias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+    
+        .card {
+            background: #e0e0e0;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+    
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        }
+    
+        .card img {
+            width: 100%;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+    
+        .card h3 {
+            font-size: 22px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+    
+        .card p {
+            font-size: 15px;
+            color: #5c5c5c;
+            margin: 0;
+        }
+    
+        .nuevo-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+    
+        .explore-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            display: block;
+            margin: 0 auto;
+        }
+    
+        .explore-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+    
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        .games-section, .videos-section, .nosotros-section, .noticias-section, .game-details-section {
+            display: none;
+        }
+    
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+    
+        .video-player iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
+    
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+    
+        .video-card {
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+    
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+        }
+    
+        .video-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+    
+        .video-card-content {
+            padding: 15px;
+        }
+    
+        .video-card h3 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+        }
+    
+        .video-card p {
+            font-size: 14px;
+            color: #5c5c5c;
+        }
+    
+        .search-filter {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    
+        .search-filter input {
+            padding: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 14px;
+        }
+    
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+    
+        .category-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    
+        .category-btn.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+    
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+        }
+    
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+    
+        .game-card {
+            background: #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+    
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+        }
+    
+        .game-card img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+    
+        .game-card h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2d2d2d;
+        }
+    
+        .game-card p {
+            font-size: 14px;
+            color: #5c5c5c;
+            margin-bottom: 10px;
+        }
+    
+        .game-card button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+    
+        .game-card button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+    
+        .nosotros-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+    
+        .nosotros-section p {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+        }
+    
+        .nosotros-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+    
+        .noticias-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+    
+        .game-details-section {
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f5f5, #0056b3);
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+    
+        .game-details-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #d0d0d0;
+            position: relative;
+        }
+    
+        .game-details-header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-right: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+    
+        .game-details-header img:hover {
+            transform: scale(1.05);
+        }
+    
+        .game-details-info {
+            text-align: left;
+        }
+    
+        .game-details-info h2 {
+            font-size: 36px;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    
+        .game-details-info p {
+            font-size: 16px;
+            color: #555;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+    
+        .game-details-info p strong {
+            color: #2d2d2d;
+            margin-right: 10px;
+            min-width: 100px;
+        }
+    
+        .game-details-images {
+            margin: 30px 0;
+        }
+    
+        .game-details-images h3 {
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: left;
+        }
+    
+        .game-details-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+    
+        .game-details-images-grid img {
+            width: 100%;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+    
+        .game-details-images-grid img:hover {
+            transform: scale(1.03);
+        }
+    
+        .game-details-description {
+            margin: 30px 0;
+        }
+    
+        .game-details-description h3 {
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: left;
+        }
+    
+        .game-details-description p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ececec;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+    
+        .download-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
+            display: inline-block;
+            margin-top: 20px;
+        }
+    
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,123,255,0.4);
+            background: linear-gradient(135deg, #0056b3, #003d82);
+        }
+    
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff4d4d, #cc0000);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+    
+        .close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+            background: linear-gradient(135deg, #cc0000, #990000);
+        }
+    
+        .noticia-imagen-grande {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin: 20px auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="javascript:void(0)" onclick="mostrarSeccion('homeSection')" class="logo">
+                <img src="img/fenixstorelogo.png" alt="Fenix Store Logo">Fenix Store
+            </a>
+            <div class="nav-menu">
+                <a href="#" class="nav-item" id="homeLink">Inicio</a>
+                <a href="#" class="nav-item" id="categoriesLink">Categorías</a>
+                <a href="#" class="nav-item" id="noticiasLink">Noticias</a>
+                <a href="#" class="nav-item" id="videosLink">Videos</a>
+                <a href="#" class="nav-item" id="nosotrosLink">Nosotros</a>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="gameSearch" placeholder="Buscar juegos...">
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="home-section" id="homeSection">
+            <div class="banner">
+                <div class="banner-slides" id="bannerSlides"></div>
+                <button class="banner-btn prev" id="prevBtn">❮</button>
+                <button class="banner-btn next" id="nextBtn">❯</button>
+            </div>
+
+            <h2 class="section-title">Juegos Destacados</h2>
+            <div class="featured-games" id="featuredGames"></div>
+
+            <h2 class="section-title">Lo Más Nuevo</h2>
+            <div class="new-games" id="newGames"></div>
+
+            
+            <div class="popular-games" id="popularGames"></div>
+
+            <h2 class="section-title">Noticias</h2>
+            <div class="news" id="news"></div>
+
+            
+            <div class="ads" id="ads"></div>
+
+            <button class="explore-btn" id="exploreMore">Explorar Más</button>
+        </div>
+
+        <div class="games-section" id="gamesSection">
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Buscar juegos...">
+            </div>
+            <div class="categories" id="categoryFilter">
+                <button class="category-btn active" data-category="all">Todas</button>
+                <button class="category-btn" data-category="Acción">Acción</button>
+                <button class="category-btn" data-category="Sistemas">Sistemas</button>
+                <button class="category-btn" data-category="Novelas">Novelas</button>
+                <button class="category-btn" data-category="Carreras">Carreras</button>
+                <button class="category-btn" data-category="Laberintos">Laberintos</button>
+            </div>
+            <div class="games-grid" id="gamesGrid"></div>
+        </div>
+
+        <div class="noticias-section" id="noticiasSection">
+            <h2 class="section-title">Noticias</h2>
+            <div class="noticias-grid" id="noticiasGrid"></div>
+        </div>
+
+        <div class="videos-section" id="videosSection">
+            <div class="video-player" id="videoPlayer">
+                <iframe src="https://www.youtube.com/embed/8zLA315EsOg" allowfullscreen></iframe>
+            </div>
+            <div class="video-grid" id="videoGrid">
+                <div class="video-card" data-video-id="dQw4w9WgXcQ">
+                    <img src="https://img.youtube.com/vi/8zLA315EsOg/hqdefault.jpg" alt="Video 1">
+                    <div class="video-card-content">
+                        <h3>Zona Infectada - Titulo</h3>
+                        <p>3 idiomas en un solo juego sin duplicar diapositivas :33 sin animaciones :33</p>
+                    </div>
+                </div>
+                <div class="video-card" data-video-id="rYvU4vHey5g">
+                    <img src="https://img.youtube.com/vi/rYvU4vHey5g/hqdefault.jpg" alt="Video 2">
+                    <div class="video-card-content">
+                        <h3>Soy Feliz||The Crow Games</h3>
+                        <p>"La historia es el objetivo primordial".</p>
+                    </div>
+                </div>
+                <div class="video-card" data-video-id="23u9H-vHM3k">
+                    <img src="https://img.youtube.com/vi/23u9H-vHM3k/hqdefault.jpg" alt="Video 3">
+                    <div class="video-card-content">
+                        <h3>El mejor juego de todos||The Crow Games</h3>
+                        <p>"La historia es el objetivo primordial".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nosotros-section" id="nosotrosSection">
+            <h2 class="section-title">Breve Historia</h2>
+            <p>La iniciativa se remonta a principios de siglo cuando el pueblo se reveló al gobierno por falta de juegos en PowerPoint.</p>
+            <img src="img/nosotros.jpg" alt="Historia">
+            <p>Las instalaciones de la empresa</p>
+            <h2 style="color: white;">Ubicacion: Latinoamérica</h2>
+            <p>Todos nuestros proyectos son importantes.</p>
+        </div>
+
+        <div class="game-details-section" id="gameDetailsSection"></div>
+    </div>
+
+    <!-- Chatbro Widget -->
+    <div id="chatbro"></div>
+
+    <script id="chatBroEmbedCode">
+        /* Chatbro Widget Embed Code Start */
+        function ChatbroLoader(chats,async){async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||navigator.userLanguage,needLoadCode:'undefined'==typeof Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.onerror=function(){console.error('Chatbro loading error')},xhr.open('GET','https://www.chatbro.com/embed.js?'+btoa(unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()}
+        /* Chatbro Widget Embed Code End */
+        ChatbroLoader({encodedChatId: '592F4'});
+    </script>
+
+    <script>
+        const juegos = [
+            {
+                nombre: "Crab Maze",
+                imagenBanner: "img/crazebanner.png",
+                imagenTarjeta: "img/craze.png",
+                descripcion: "Un laberinto desafiante donde solo los más precisos alcanzan la meta.",
+                categoria: "Laberintos",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0",
+                imagenes: [
+                    "img/craze.png",
+                    "img/craze2.png",
+                    "img/craze3.png"
+                ],
+                descripcionCompleta: "Crab Maze es un juego de precisión donde solo tu destreza con el mouse te llevará a la victoria. Navega por intrincados laberintos sin salirte del camino, o perderás al instante. Con un diseño inspirado en la playa y los cangrejos, cada movimiento cuenta mientras intentas alcanzar la meta. ¿Tienes el pulso firme para superar el desafío sin equivocarte?",
+                enBanner: true,
+                destacado: true,
+                nuevo: true,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/n0qkc1qphyfnpnc/CRAB_MAZE.ppsx/file"
+            },
+            {
+                nombre: "5 Seconds",
+                imagenBanner: "img/5seconds.png",
+                imagenTarjeta: "img/5seconds.png",
+                descripcion: "Haz clic en los objetivos antes de que el tiempo se agote. ¡Piensa rápido!",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0",
+                imagenes: [
+                    "img/5S1.png",
+                    "img/5S2.png",
+                    "img/5S3.png"
+                ],
+                descripcionCompleta: "En 5 Seconds, cada segundo cuenta. Encuentra y haz clic en los cuadros negros antes de que el tiempo llegue a cero. A medida que avanzas, el desafío se vuelve más intenso y cada decisión debe ser rápida y precisa. Pon a prueba tus reflejos y tu velocidad en este adictivo juego de reacción.",
+                enBanner: true,
+                destacado: true,
+                nuevo: true,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/rs6u55m8krnpsju/5_Seconds.ppsx/file"
+            },
+            {
+                nombre: "Fortnite PPT OG",
+                imagenBanner: "img/fortnite-og.jpg",
+                imagenTarjeta: "img/fortniteog.jpg",
+                descripcion: "Lucha por tu vida en un campo de batalla lleno de sorpresas y acción.",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0.2 (Beta)",
+                imagenes: [
+                    "img/for1.png",
+                    "img/for2.png",
+                    "img/for3.png"
+                ],
+                descripcionCompleta: "En Fortnite PPT, te sumerges en un campo de batalla lleno de acción donde tu objetivo es ser el último en pie. Deberás construir refugios, recoger recursos y enfrentarte a otros jugadores en una isla donde solo los más astutos sobrevivirán. La estrategia, la rapidez y la habilidad para construir son clave para superar a tus oponentes y ganar la partida.",
+                enBanner: true,
+                destacado: true,
+                nuevo: true,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/5s07ujwy8ibgstj/Fortnite_OG_PPT.zip/file"
+            },
+            {
+                nombre: "JETPACK JOYRIDE PPT",
+                imagenBanner: "img/jetpackbanner.png",
+                imagenTarjeta: "img/jetpacklogo.png",
+                descripcion: "Evita los obstáculos y supera la mayor distancia posible.",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "0.5 (Demo)",
+                imagenes: [
+                    "img/jet1.png",
+                    "img/jet2.png",
+                    "img/jet3.png"
+                ],
+                descripcionCompleta: "Vuela a través de un mundo de obstáculos en Jetpack Joirride, un juego que desafía tu capacidad para esquivar y sobrevivir. Mientras avanzas, te enfrentas a obstáculos cada vez más complejos, que ponen a prueba tu agilidad y reflejos. El ritmo se acelera, lo que hace que cada decisión sea más crucial. Con cada intento, tu habilidad para adaptarte y reaccionar te llevará más lejos en este emocionante desafío aéreo.",
+                enBanner: true,
+                destacado: true,
+                nuevo: true,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/vj9g4368lkdcl2f/mouse_joirride.ppsx/file"
+            },
+            {
+                nombre: "Fenix Os Mobile",
+                imagenBanner: "img/Fenixmobilebanner.png",
+                imagenTarjeta: "img/FenixMobile.png",
+                descripcion: "Explora un sistema operativo único con un diseño fluido y animaciones dinámicas.",
+                categoria: "Sistemas",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0.1 (Demo)",
+                imagenes: [
+                    "img/FM1.png",
+                    "img/FM2.png",
+                    "img/FM3.png"
+                ],
+                descripcionCompleta: "Te presentamos Fénix Mobile, un sistema operativo único creado en PowerPoint, pensado para ofrecer una experiencia visual impecable. Su diseño es limpio, elegante y moderno, con una interfaz intuitiva que facilita la navegación. Las animaciones fluidas en cada sección hacen que explorar el sistema sea una experiencia dinámica y atractiva.",
+                enBanner: true,
+                destacado: true,
+                nuevo: true,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/cxpvprywe43ag77/Fenix_movile_demo.ppsx/file"
+            }
+        ];
+
+        const noticias = [
+            {
+                titulo: "Nuevos Juegos del Papitas",
+                imagen: "img/noti.png",
+                textoCorto: "Inesperado regreso del papitas a los juegos ppt",
+                textoCompleto: "Después de varios meses de ausencia, el reconocido desarrollador El Papitas ha regresado con grandes novedades. No solo ha vuelto con uno o dos juegos, sino con ¡cinco increíbles títulos! Además, para hacer aún más emocionante su regreso, ha lanzado estos juegos en su nueva tienda en línea, Fenix Store, donde los jugadores podrán acceder a ellos fácilmente. ",
+                fecha: "9 de Marzo de 2025"
+            },
+            {
+                titulo: "Fenix Os Mobile",
+                imagen: "img/FenixMobile.png",
+                textoCorto: "Demo de Fenix mobile",
+                textoCompleto: "El desarrollador El Papitas ha sorprendido a la comunidad con el lanzamiento de Fenix OS Mobile en su nueva tienda en línea. Esta versión del sistema operativo, que muchos pensaban que nunca vería la luz, finalmente ha sido publicada, dejando a todos sorprendidos. Con el lanzamiento de Fenix Mobile en su versión 1.0.1 (Demo), El Papitas demuestra su habilidad para sorprender y deleitar a sus seguidores. Esta versión inicial promete ofrecer una experiencia única, y los usuarios ahora tienen la oportunidad de probarla a través de la tienda Fenix Store.",
+                fecha: "9 de Marzo de 2025"
+            },
+            {
+                titulo: "ppia/bellaco69",
+                imagen: "img/paia.png",
+                textoCorto: "Papia es bellaco 69?",
+                textoCompleto: "Si, si son la misma persona, esto se puede comprobar al ver el juego llamado (Crab Maze), El cual fue mostrado por bellaco a administradores de la comunidad, y al verlo en el sitio web de Fenix Store, se puede ver que el autor es nada mas y nada menos que El Papitas, confirmando que bellaco69, y papia son la misma persona.",
+                fecha: "05 de Marzo de 2025"
+            }
+        ];
+
+        let lastSection = 'homeSection';
+
+        function cargarContenidoInicio() {
+            const bannerSlides = document.getElementById('bannerSlides');
+            bannerSlides.innerHTML = '';
+            juegos.filter(juego => juego.enBanner).slice(0, 5).forEach(juego => {
+                const slide = document.createElement('div');
+                slide.className = 'banner-slide';
+                slide.innerHTML = `
+                    <img src="${juego.imagenBanner}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                `;
+                bannerSlides.appendChild(slide);
+            });
+
+            cargarSeccion('featuredGames', juegos.filter(juego => juego.destacado));
+            cargarSeccion('newGames', juegos.filter(juego => juego.nuevo));
+            cargarSeccion('popularGames', juegos.filter(juego => juego.popular));
+            cargarSeccionNoticiasInicio('news', noticias);
+            document.getElementById('ads').innerHTML = '';
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentSlide = 0;
+            const totalSlides = bannerSlides.children.length;
+
+            function updateBanner() {
+                bannerSlides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateBanner();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateBanner();
+            });
+
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateBanner();
+            }, 5000);
+        }
+
+        function cargarSeccion(sectionId, juegosFiltrados) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+            juegosFiltrados.forEach(juego => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                    <p>${juego.descripcion}</p>
+                    ${juego.nuevo ? '<span class="nuevo-tag">Nuevo</span>' : ''}
+                `;
+                card.addEventListener('click', () => mostrarDetallesJuego(juego));
+                section.appendChild(card);
+            });
+        }
+
+        function cargarSeccionNoticiasInicio(sectionId, noticiasFiltradas) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+            noticiasFiltradas.forEach(noticia => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                    <h3>${noticia.titulo}</h3>
+                    <p>${noticia.textoCorto}</p>
+                `;
+                card.addEventListener('click', () => mostrarSeccion('noticiasSection'));
+                section.appendChild(card);
+            });
+        }
+
+        function cargarContenidoCategorias() {
+            filtrarJuegos('all');
+        }
+
+        function cargarContenidoNoticias() {
+            const noticiasGrid = document.getElementById('noticiasGrid');
+            noticiasGrid.innerHTML = '';
+            noticias.forEach(noticia => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                    <h3>${noticia.titulo}</h3>
+                    <p>${noticia.textoCorto}</p>
+                `;
+                card.addEventListener('click', () => mostrarDetallesNoticia(noticia));
+                noticiasGrid.appendChild(card);
+            });
+        }
+
+        function mostrarDetallesJuego(juego) {
+            const sections = ['homeSection', 'gamesSection', 'noticiasSection', 'videosSection', 'nosotrosSection', 'gameDetailsSection'];
+            lastSection = sections.find(id => document.getElementById(id).style.display === 'block') || 'homeSection';
+            sections.forEach(id => document.getElementById(id).style.display = id === 'gameDetailsSection' ? 'block' : 'none');
+
+            const gameDetailsSection = document.getElementById('gameDetailsSection');
+            gameDetailsSection.innerHTML = `
+                <div class="game-details-header">
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <div class="game-details-info">
+                        <h2>${juego.nombre}</h2>
+                        <p><strong>Desarrollador:</strong> ${juego.desarrollador}</p>
+                        <p><strong>Lanzamiento:</strong> ${juego.lanzamiento}</p>
+                        <p><strong>Versión:</strong> ${juego.version}</p>
+                        <p><strong>Categoría:</strong> ${juego.categoria}</p>
+                    </div>
+                </div>
+                <div class="game-details-images">
+                    <h3>Imágenes</h3>
+                    <div class="game-details-images-grid">
+                        ${juego.imagenes.map(img => `<img src="${img}" alt="${juego.nombre} imagen">`).join('')}
+                    </div>
+                </div>
+                <div class="game-details-description">
+                    <h3>Descripción</h3>
+                    <p>${juego.descripcionCompleta}</p>
+                </div>
+                <button class="download-btn" onclick="window.location.href='${juego.linkDescarga}'">Descargar Ahora</button>
+                <button class="close-btn" onclick="cerrarDetallesJuego()">Atrás</button>
+            `;
+        }
+
+        function mostrarDetallesNoticia(noticia) {
+            const sections = ['homeSection', 'gamesSection', 'noticiasSection', 'videosSection', 'nosotrosSection', 'gameDetailsSection'];
+            lastSection = sections.find(id => document.getElementById(id).style.display === 'block') || 'noticiasSection';
+            sections.forEach(id => document.getElementById(id).style.display = id === 'gameDetailsSection' ? 'block' : 'none');
+
+            const gameDetailsSection = document.getElementById('gameDetailsSection');
+            gameDetailsSection.innerHTML = `
+                <div class="game-details-header">
+                    <div class="game-details-info">
+                        <h2>${noticia.titulo}</h2>
+                        <p><strong>Fecha:</strong> ${noticia.fecha}</p>
+                    </div>
+                </div>
+                <div class="game-details-description">
+                    <h3>Detalles</h3>
+                    <p>${noticia.textoCompleto}</p>
+                </div>
+                <img src="${noticia.imagen}" alt="${noticia.titulo}" class="noticia-imagen-grande">
+                <button class="close-btn" onclick="cerrarDetallesJuego()">Atrás</button>
+            `;
+        }
+
+        function cerrarDetallesJuego() {
+            mostrarSeccion(lastSection);
+        }
+
+        function filtrarJuegos(categoria, terminoBusqueda = '') {
+            const gamesGrid = document.getElementById('gamesGrid');
+            gamesGrid.innerHTML = '';
+            let juegosFiltrados = categoria === 'all' ? juegos : juegos.filter(juego => juego.categoria === categoria);
+
+            if (terminoBusqueda) {
+                juegosFiltrados = juegosFiltrados.filter(juego => 
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda) ||
+                    juego.categoria.toLowerCase().includes(terminoBusqueda)
+                );
+            }
+
+            juegosFiltrados.forEach(juego => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                gameCard.innerHTML = `
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                    <p>${juego.descripcion}</p>
+                    ${juego.nuevo ? '<span class="nuevo-tag">Nuevo</span>' : ''}
+                    <button onclick="window.location.href='${juego.linkDescarga}'">Descargar</button>
+                `;
+                gameCard.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') mostrarDetallesJuego(juego);
+                });
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+
+        const sections = {
+            homeSection: cargarContenidoInicio,
+            gamesSection: cargarContenidoCategorias,
+            noticiasSection: cargarContenidoNoticias,
+            videosSection: () => {},
+            nosotrosSection: () => {},
+            gameDetailsSection: () => {}
+        };
+
+        function mostrarSeccion(seccionId) {
+            Object.keys(sections).forEach(id => {
+                document.getElementById(id).style.display = id === seccionId ? 'block' : 'none';
+            });
+            if (sections[seccionId]) sections[seccionId]();
+        }
+
+        document.getElementById('homeLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('homeSection'); });
+        document.getElementById('categoriesLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('gamesSection'); });
+        document.getElementById('noticiasLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('noticiasSection'); });
+        document.getElementById('videosLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('videosSection'); });
+        document.getElementById('nosotrosLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('nosotrosSection'); });
+        document.getElementById('exploreMore').addEventListener('click', () => mostrarSeccion('gamesSection'));
+
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const terminoBusqueda = this.value.toLowerCase();
+            const categoriaActiva = document.querySelector('.category-btn.active').dataset.category;
+            filtrarJuegos(categoriaActiva, terminoBusqueda);
+        });
+
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                const categoria = this.dataset.category;
+                const terminoBusqueda = document.getElementById('searchInput').value.toLowerCase();
+                filtrarJuegos(categoria, terminoBusqueda);
+            });
+        });
+
+        document.getElementById('gameSearch').addEventListener('input', function() {
+            const terminoBusqueda = this.value.toLowerCase();
+            const currentSection = Object.keys(sections).find(id => document.getElementById(id).style.display === 'block');
+
+            if (currentSection === 'homeSection') {
+                cargarSeccion('featuredGames', juegos.filter(juego => juego.destacado && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccion('newGames', juegos.filter(juego => juego.nuevo && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccion('popularGames', juegos.filter(juego => juego.popular && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccionNoticiasInicio('news', noticias.filter(noticia => (
+                    noticia.titulo.toLowerCase().includes(terminoBusqueda) ||
+                    noticia.textoCorto.toLowerCase().includes(terminoBusqueda)
+                )));
+                document.getElementById('ads').innerHTML = '';
+            } else if (currentSection === 'gamesSection') {
+                const categoriaActiva = document.querySelector('.category-btn.active').dataset.category;
+                filtrarJuegos(categoriaActiva, terminoBusqueda);
+            } else if (currentSection === 'noticiasSection') {
+                const noticiasGrid = document.getElementById('noticiasGrid');
+                noticiasGrid.innerHTML = '';
+                noticias.filter(noticia => (
+                    noticia.titulo.toLowerCase().includes(terminoBusqueda) ||
+                    noticia.textoCorto.toLowerCase().includes(terminoBusqueda)
+                )).forEach(noticia => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                        <h3>${noticia.titulo}</h3>
+                        <p>${noticia.textoCorto}</p>
+                    `;
+                    card.addEventListener('click', () => mostrarDetallesNoticia(noticia));
+                    noticiasGrid.appendChild(card);
+                });
+            }
+
+            if (!terminoBusqueda) {
+                if (currentSection === 'homeSection') cargarContenidoInicio();
+                else if (currentSection === 'gamesSection') filtrarJuegos(document.querySelector('.category-btn.active').dataset.category);
+                else if (currentSection === 'noticiasSection') cargarContenidoNoticias();
+            }
+        });
+
+        const videoPlayer = document.getElementById('videoPlayer').querySelector('iframe');
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const videoId = this.dataset.videoId;
+                videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            });
+        });
+
+        cargarContenidoInicio();
+        mostrarSeccion('homeSection');
+    </script>
+</body>
+</html>
