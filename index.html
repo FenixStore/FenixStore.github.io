@@ -1,0 +1,2788 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fenix Store</title>
+    <link rel="icon" type="image/png" href="img/fenixstorelogo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2d2d2d, #5c5c5c, #8a8a8a);
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 100px;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        .logo img {
+            height: 32px;
+            margin-right: 8px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 6px 10px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 160px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 25px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .home-section {
+            text-align: center;
+            padding: 60px 0;
+            position: relative;
+        }
+
+        .banner {
+            position: relative;
+            max-width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .banner-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+
+        .banner-slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .banner-slide::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            opacity: 0;
+            /* Inicialmente invisible */
+            transition: opacity 0.3s ease;
+            /* Transición suave */
+        }
+
+        .banner-slide:hover::after {
+            opacity: 1;
+            /* Aparece al pasar el cursor */
+        }
+
+        .banner-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .banner-slide h3 {
+            position: absolute;
+            color: white;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+            opacity: 0;
+            /* Inicialmente invisible */
+            transition: opacity 0.3s ease;
+            /* Transición suave */
+        }
+
+        .banner-slide:hover h3 {
+            opacity: 1;
+            /* Aparece al pasar el cursor */
+        }
+
+        .banner-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            font-size: 20px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease, transform 0.3s ease;
+            z-index: 3;
+        }
+
+        .banner-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .banner-btn.prev {
+            left: 20px;
+        }
+
+        .banner-btn.next {
+            right: 20px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .featured-games,
+        .new-games,
+        .popular-games,
+        .news,
+        .ads,
+        .games-grid,
+        .noticias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: #e0e0e0;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            font-size: 22px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 15px;
+            color: #5c5c5c;
+            margin: 0;
+        }
+
+        .nuevo-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .explore-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .explore-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .events-section,
+        .event-details-section,
+        .nosotros-section,
+        .noticias-section,
+        .game-details-section {
+            display: none;
+        }
+
+        /* Event Details Style */
+        .event-details-container {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            border: 1px solid #38bdf8;
+            margin-top: 20px;
+        }
+
+        .jam-header {
+            text-align: center;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+
+        .jam-header h2 {
+            font-size: 42px;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        .jam-meta {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .jam-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+        }
+
+        .jam-info-panel h3 {
+            color: #38bdf8;
+            margin-bottom: 15px;
+        }
+
+        .jam-submission-panel {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: fit-content;
+        }
+
+        .jam-submission-panel h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .jam-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .jam-form input,
+        .jam-form textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 14px;
+        }
+
+        .btn-submit-jam {
+            width: 100%;
+            padding: 12px;
+            background: #38bdf8;
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit-jam:hover {
+            background: white;
+            transform: scale(1.02);
+        }
+
+        .jam-entries-section {
+            margin-top: 50px;
+        }
+
+        .jam-entries-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .jam-entry-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .jam-entry-item:hover {
+            transform: translateX(10px);
+            border-color: #38bdf8;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .jam-entry-item img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .jam-entry-info-text {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .jam-entry-info-text h4 {
+            font-size: 18px;
+            color: #38bdf8;
+            margin-bottom: 4px;
+        }
+
+        .jam-entry-info-text p {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .jam-entry-info-text p {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .vote-badge {
+            position: absolute;
+            background: rgba(0, 212, 255, 0.9);
+            color: #0f172a;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 5;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+        }
+
+        .jam-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .btn-vote {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .btn-vote:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
+        .vote-count-detail {
+            font-size: 18px;
+            color: #ffd700;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .podium-badge {
+            position: absolute;
+            left: -10px;
+            top: -10px;
+            padding: 6px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 13px;
+            z-index: 20;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transform: rotate(-5deg);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .podium-badge.gold {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: #000;
+        }
+
+        .podium-badge.silver {
+            background: linear-gradient(135deg, #e2e2e2, #999);
+            color: #000;
+        }
+
+        .podium-badge.bronze {
+            background: linear-gradient(135deg, #cd7f32, #8b4513);
+            color: white;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 20px 0;
+        }
+
+        .event-card {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .event-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .event-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+
+        .event-card .event-date {
+            font-size: 14px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .event-card .event-desc {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .event-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .badge-inscripcion {
+            background: #16a34a !important;
+            color: white !important;
+        }
+
+        .badge-votacion {
+            background: #38bdf8 !important;
+            color: #0f172a !important;
+        }
+
+        .badge-upcoming {
+            background: #64748b !important;
+            color: white !important;
+        }
+
+        .badge-ended {
+            background: #dc2626 !important;
+            color: white !important;
+        }
+
+        .join-event-btn {
+            background: #00d4ff;
+            color: #1e3c72;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .join-event-btn:hover {
+            background: white;
+            color: #1e3c72;
+            transform: scale(1.05);
+        }
+
+        .video-player {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .video-player iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .video-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+        .video-card-content {
+            padding: 15px;
+        }
+
+        .video-card h3 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+        }
+
+        .video-card p {
+            font-size: 14px;
+            color: #5c5c5c;
+        }
+
+        .search-filter {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .search-filter input {
+            padding: 10px;
+            width: 250px;
+            border: none;
+            border-radius: 25px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .category-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #e0e0e0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .game-card {
+            background: #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .game-card img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            object-fit: cover;
+        }
+
+        .game-card h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #2d2d2d;
+        }
+
+        .game-card p {
+            font-size: 14px;
+            color: #5c5c5c;
+            margin-bottom: 10px;
+        }
+
+        .game-card button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .game-card button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .nosotros-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .nosotros-section p {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .nosotros-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .noticias-section {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .game-details-section {
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f5f5, #0056b3);
+            border-radius: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-details-header {
+            display: flex;
+            align-items: center;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #d0d0d0;
+            position: relative;
+        }
+
+        .game-details-header img {
+            width: 150px;
+            height: 150px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-right: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .game-details-header img:hover {
+            transform: scale(1.05);
+        }
+
+        .game-details-info {
+            text-align: left;
+        }
+
+        .game-details-info h2 {
+            font-size: 36px;
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .game-details-info p {
+            font-size: 16px;
+            color: #555;
+            margin: 8px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .game-details-info p strong {
+            color: #2d2d2d;
+            margin-right: 10px;
+            min-width: 100px;
+        }
+
+        .game-details-images {
+            margin: 30px 0;
+        }
+
+        .game-details-images h3 {
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .game-details-images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .game-details-images-grid img {
+            width: 100%;
+            height: 180px;
+            border-radius: 15px;
+            object-fit: cover;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .game-details-images-grid img:hover {
+            transform: scale(1.03);
+        }
+
+        .game-details-description {
+            margin: 30px 0;
+        }
+
+        .game-details-description h3 {
+            font-size: 24px;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .game-details-description p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ececec;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+            background: linear-gradient(135deg, #0056b3, #003d82);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff4d4d, #cc0000);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
+            background: linear-gradient(135deg, #cc0000, #990000);
+        }
+
+        .noticia-imagen-grande {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            margin: 20px auto;
+            display: block;
+        }
+
+        /* Login/Register Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298, #3d5fa8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: #ffffff;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 77, 77, 0.8);
+            border-color: rgba(255, 77, 77, 1);
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d2d2d;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .toggle-form a {
+            color: #00d4ff;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .toggle-form a:hover {
+            color: #00ffff;
+        }
+
+        .error-message {
+            background: #ff4d4d;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .success-message {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .user-info {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .user-info.active {
+            display: flex;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .btn-logout {
+            background: rgba(255, 77, 77, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 4px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 77, 77, 0.4);
+        }
+
+        .upload-game-section {
+            display: none;
+            padding: 40px 20px;
+        }
+
+        .upload-form {
+            background: linear-gradient(135deg, #1e3c72, #2a5298, #3d5fa8);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .upload-form h2 {
+            color: #ffffff;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .upload-form .form-group label {
+            color: #ffffff;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-form .form-group input,
+        .upload-form .form-group textarea,
+        .upload-form .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2d2d2d;
+        }
+
+        .upload-form .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        }
+
+        .my-games-container {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .my-games-container h3 {
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .my-game-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .status-approved {
+            background: #28a745;
+            color: #fff;
+        }
+    </style>
+
+    <!-- Firebase SDK (only Database, no Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="javascript:void(0)" onclick="mostrarSeccion('homeSection')" class="logo">
+                <img src="img/fenixstorelogo.png" alt="Fenix Store Logo">Fenix Store
+            </a>
+            <div class="nav-menu">
+                <a href="#" class="nav-item" id="homeLink">Inicio</a>
+                <a href="#" class="nav-item" id="categoriesLink">Categorías</a>
+                <a href="#" class="nav-item" id="noticiasLink">Noticias</a>
+                <a href="#" class="nav-item" id="videosLink">Videos</a>
+                <a href="#" class="nav-item" id="eventsLink">Eventos</a>
+                <a href="#" class="nav-item" id="nosotrosLink">Nosotros</a>
+                <a href="#" class="nav-item" id="uploadLink" style="display: none;">Subir Juego</a>
+                <a href="#" class="nav-item" id="loginBtn">Iniciar Sesión</a>
+                <div class="user-info" id="userInfo">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn-logout" id="logoutBtn">Cerrar Sesión</button>
+                </div>
+            </div>
+            <div class="search-bar">
+                <input type="text" id="gameSearch" placeholder="Buscar juegos...">
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="home-section" id="homeSection">
+            <div class="banner">
+                <div class="banner-slides" id="bannerSlides"></div>
+                <button class="banner-btn prev" id="prevBtn">❮</button>
+                <button class="banner-btn next" id="nextBtn">❯</button>
+            </div>
+
+            <h2 class="section-title">Juegos Destacados</h2>
+            <div class="featured-games" id="featuredGames"></div>
+
+            <h2 class="section-title">Lo Más Nuevo</h2>
+            <div class="new-games" id="newGames"></div>
+
+
+            <div class="popular-games" id="popularGames"></div>
+
+            <h2 class="section-title">Noticias</h2>
+            <div class="news" id="news"></div>
+
+
+            <div class="ads" id="ads"></div>
+
+            <button class="explore-btn" id="exploreMore">Explorar Más</button>
+        </div>
+
+        <div class="games-section" id="gamesSection">
+            <div class="search-filter">
+                <input type="text" id="searchInput" placeholder="Buscar juegos...">
+            </div>
+            <div class="categories" id="categoryFilter">
+                <button class="category-btn active" data-category="all">Todas</button>
+                <button class="category-btn" data-category="Acción">Acción</button>
+                <button class="category-btn" data-category="Sistemas">Sistemas</button>
+                <button class="category-btn" data-category="Novelas">Novelas</button>
+                <button class="category-btn" data-category="Carreras">Carreras</button>
+                <button class="category-btn" data-category="Laberintos">Laberintos</button>
+            </div>
+            <div class="games-grid" id="gamesGrid"></div>
+        </div>
+
+        <div class="noticias-section" id="noticiasSection">
+            <h2 class="section-title">Noticias</h2>
+            <div class="noticias-grid" id="noticiasGrid"></div>
+        </div>
+
+        <div class="videos-section" id="videosSection">
+            <div class="video-player" id="videoPlayer">
+                <iframe src="https://www.youtube.com/embed/8zLA315EsOg" allowfullscreen></iframe>
+            </div>
+            <div class="video-grid" id="videoGrid">
+                <div class="video-card" data-video-id="dQw4w9WgXcQ">
+                    <img src="https://img.youtube.com/vi/8zLA315EsOg/hqdefault.jpg" alt="Video 1">
+                    <div class="video-card-content">
+                        <h3>Zona Infectada - Titulo</h3>
+                        <p>3 idiomas en un solo juego sin duplicar diapositivas :33 sin animaciones :33</p>
+                    </div>
+                </div>
+                <div class="video-card" data-video-id="rYvU4vHey5g">
+                    <img src="https://img.youtube.com/vi/rYvU4vHey5g/hqdefault.jpg" alt="Video 2">
+                    <div class="video-card-content">
+                        <h3>Soy Feliz||The Crow Games</h3>
+                        <p>"La historia es el objetivo primordial".</p>
+                    </div>
+                </div>
+                <div class="video-card" data-video-id="23u9H-vHM3k">
+                    <img src="https://img.youtube.com/vi/23u9H-vHM3k/hqdefault.jpg" alt="Video 3">
+                    <div class="video-card-content">
+                        <h3>El mejor juego de todos||The Crow Games</h3>
+                        <p>"La historia es el objetivo primordial".</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="events-section" id="eventsSection">
+            <h2 class="section-title">Próximos Eventos & Game Jams</h2>
+            <div class="events-grid" id="eventsGrid">
+                <!-- Events will be loaded from Firebase -->
+                <p style="color: white; text-align: center; grid-column: 1/-1;">Cargando eventos interesantes...</p>
+            </div>
+        </div>
+
+        <div class="event-details-section" id="eventDetailsSection">
+            <div id="jamDetailContent">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+
+        <div class="nosotros-section" id="nosotrosSection">
+            <h2 class="section-title">Breve Historia</h2>
+            <p>La iniciativa se remonta a principios de siglo cuando el pueblo se reveló al gobierno por falta de juegos
+                en PowerPoint.</p>
+            <img src="img/nosotros.jpg" alt="Historia">
+            <p>Las instalaciones de la empresa</p>
+            <h2 style="color: white;">Ubicacion: Latinoamérica</h2>
+            <p>Todos nuestros proyectos son importantes.</p>
+        </div>
+
+        <div class="game-details-section" id="gameDetailsSection"></div>
+
+        <div class="upload-game-section" id="uploadGameSection">
+            <div class="upload-form">
+                <h2>Subir Nuevo Juego</h2>
+                <div class="success-message" id="uploadSuccess"></div>
+                <div class="error-message" id="uploadError"></div>
+                <form id="uploadGameForm">
+                    <div class="form-group">
+                        <label for="gameName">Nombre del Juego *</label>
+                        <input type="text" id="gameName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameImageBanner">URL Imagen Banner *</label>
+                        <input type="url" id="gameImageBanner" placeholder="https://ejemplo.com/banner.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameImageCard">URL Imagen Tarjeta *</label>
+                        <input type="url" id="gameImageCard" placeholder="https://ejemplo.com/card.png" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameDescription">Descripción Corta *</label>
+                        <textarea id="gameDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameCategory">Categoría *</label>
+                        <select id="gameCategory" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Acción">Acción</option>
+                            <option value="Sistemas">Sistemas</option>
+                            <option value="Novelas">Novelas</option>
+                            <option value="Carreras">Carreras</option>
+                            <option value="Laberintos">Laberintos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameVersion">Versión *</label>
+                        <input type="text" id="gameVersion" placeholder="1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameImage1">URL Imagen 1</label>
+                        <input type="url" id="gameImage1" placeholder="https://ejemplo.com/img1.png">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameImage2">URL Imagen 2</label>
+                        <input type="url" id="gameImage2" placeholder="https://ejemplo.com/img2.png">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameImage3">URL Imagen 3</label>
+                        <input type="url" id="gameImage3" placeholder="https://ejemplo.com/img3.png">
+                    </div>
+                    <div class="form-group">
+                        <label for="gameDescriptionFull">Descripción Completa *</label>
+                        <textarea id="gameDescriptionFull" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gameDownloadLink">Link de Descarga *</label>
+                        <input type="url" id="gameDownloadLink" placeholder="https://mediafire.com/..." required>
+                    </div>
+                    <button type="submit" class="btn-primary">Enviar Juego para Revisión</button>
+                    <button type="button" class="btn-secondary"
+                        onclick="mostrarSeccion('homeSection')">Cancelar</button>
+                </form>
+
+                <div class="my-games-container">
+                    <h3>Mis Juegos Subidos</h3>
+                    <div id="myGamesList">
+                        <p style="text-align: center; color: rgba(255,255,255,0.5);">Cargando tus juegos...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Register Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content">
+            <button class="modal-close-btn" id="closeAuthModalX">×</button>
+            <h2 id="authTitle">Iniciar Sesión</h2>
+            <div class="error-message" id="authError"></div>
+            <div class="success-message" id="authSuccess"></div>
+
+            <!-- Login Form -->
+            <form id="loginForm" method="POST" action="#">
+                <div class="form-group">
+                    <label for="loginUsername">Nombre de Usuario</label>
+                    <input type="text" id="loginUsername" name="username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña</label>
+                    <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="btn-primary">Iniciar Sesión</button>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" style="display: none;" method="POST" action="#">
+                <div class="form-group">
+                    <label for="registerName">Nombre de Usuario</label>
+                    <input type="text" id="registerName" name="username" autocomplete="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña</label>
+                    <input type="password" id="registerPassword" name="password" autocomplete="new-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPasswordConfirm">Confirmar Contraseña</label>
+                    <input type="password" id="registerPasswordConfirm" name="password_confirm"
+                        autocomplete="new-password" required>
+                </div>
+                <button type="submit" class="btn-primary">Registrarse</button>
+            </form>
+
+            <div class="toggle-form">
+                <span id="toggleText">¿No tienes cuenta? <a id="toggleAuthForm">Regístrate aquí</a></span>
+            </div>
+            <button class="btn-secondary" id="closeAuthModal">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Chatbro Widget -->
+    <div id="chatbro"></div>
+
+    <script id="chatBroEmbedCode">
+        /* Chatbro Widget Embed Code Start */
+        function ChatbroLoader(chats, async) { async = !1 !== async; var params = { embedChatsParameters: chats instanceof Array ? chats : [chats], lang: navigator.language || navigator.userLanguage, needLoadCode: 'undefined' == typeof Chatbro, embedParamsVersion: localStorage.embedParamsVersion, chatbroScriptVersion: localStorage.chatbroScriptVersion }, xhr = new XMLHttpRequest; xhr.withCredentials = !0, xhr.onload = function () { eval(xhr.responseText) }, xhr.onerror = function () { console.error('Chatbro loading error') }, xhr.open('GET', 'https://www.chatbro.com/embed.js?' + btoa(unescape(encodeURIComponent(JSON.stringify(params)))), async), xhr.send() }
+        /* Chatbro Widget Embed Code End */
+        ChatbroLoader({ encodedChatId: '592F4' });
+    </script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCw0v9mVUpOO8HYYfHLhyzkgIMfoBljJcQ",
+            authDomain: "fortnite-8012b.firebaseapp.com",
+            databaseURL: "https://fortnite-8012b-default-rtdb.firebaseio.com",
+            projectId: "fortnite-8012b",
+            storageBucket: "fortnite-8012b.firebasestorage.app",
+            messagingSenderId: "862924450554",
+            appId: "1:862924450554:web:b01ab7f85afa7965c2f743",
+            measurementId: "G-8Q997GYMM2"
+        };
+
+        // Initialize Firebase (only Database, no Auth)
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Current user state
+        let currentUser = null;
+
+        // Check if user is logged in (from localStorage)
+        function checkUserSession() {
+            const savedUser = localStorage.getItem('fenixStoreUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUIForLoggedInUser(currentUser.username);
+            }
+        }
+
+        // Update UI for logged in user
+        function updateUIForLoggedInUser(username) {
+            document.getElementById('userName').textContent = username;
+            document.getElementById('userInfo').classList.add('active');
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('uploadLink').style.display = 'block';
+        }
+
+        // Update UI for logged out user
+        function updateUIForLoggedOutUser() {
+            document.getElementById('userInfo').classList.remove('active');
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('uploadLink').style.display = 'none';
+        }
+
+        // Hash password (simple hash for demo - in production use better encryption)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
+        }
+
+        // Initialize session on page load
+        checkUserSession();
+
+        // Show Auth Modal
+        document.getElementById('loginBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('authModal').classList.add('active');
+        });
+
+        // Close Auth Modal
+        document.getElementById('closeAuthModal').addEventListener('click', () => {
+            document.getElementById('authModal').classList.remove('active');
+            clearAuthForms();
+        });
+
+        // Close Auth Modal with X button
+        document.getElementById('closeAuthModalX').addEventListener('click', () => {
+            document.getElementById('authModal').classList.remove('active');
+            clearAuthForms();
+        });
+
+        // Toggle between Login and Register
+        let isLoginMode = true;
+        document.getElementById('toggleAuthForm').addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                document.getElementById('authTitle').textContent = 'Iniciar Sesión';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('toggleText').innerHTML = '¿No tienes cuenta? <a id="toggleAuthForm">Regístrate aquí</a>';
+            } else {
+                document.getElementById('authTitle').textContent = 'Registrarse';
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('registerForm').style.display = 'block';
+                document.getElementById('toggleText').innerHTML = '¿Ya tienes cuenta? <a id="toggleAuthForm">Inicia sesión aquí</a>';
+            }
+            clearAuthForms();
+            // Re-attach event listener
+            document.getElementById('toggleAuthForm').addEventListener('click', arguments.callee);
+        });
+
+        // Login Form Submit
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!username || !password) {
+                showAuthError('Por favor completa todos los campos');
+                return;
+            }
+
+            try {
+                // Check if user exists in database
+                const userSnapshot = await database.ref('fenixstore/users/' + username).once('value');
+
+                if (!userSnapshot.exists()) {
+                    showAuthError('Usuario no encontrado');
+                    return;
+                }
+
+                const userData = userSnapshot.val();
+                const hashedPassword = hashPassword(password);
+
+                if (userData.password !== hashedPassword) {
+                    showAuthError('Contraseña incorrecta');
+                    return;
+                }
+
+                // Login successful
+                currentUser = {
+                    username: username,
+                    createdAt: userData.createdAt
+                };
+
+                // Save to localStorage
+                localStorage.setItem('fenixStoreUser', JSON.stringify(currentUser));
+
+                updateUIForLoggedInUser(username);
+                showAuthSuccess('¡Inicio de sesión exitoso!');
+
+                setTimeout(() => {
+                    document.getElementById('authModal').classList.remove('active');
+                    clearAuthForms();
+                }, 1500);
+            } catch (error) {
+                showAuthError('Error al iniciar sesión: ' + error.message);
+            }
+        });
+
+        // Register Form Submit
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('registerName').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (!username || !password || !passwordConfirm) {
+                showAuthError('Por favor completa todos los campos');
+                return;
+            }
+
+            // Validate username (no special characters)
+            if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+                showAuthError('El nombre de usuario solo puede contener letras, números y guiones bajos');
+                return;
+            }
+
+            // Validate passwords match
+            if (password !== passwordConfirm) {
+                showAuthError('Las contraseñas no coinciden');
+                return;
+            }
+
+            // Validate password length
+            if (password.length < 6) {
+                showAuthError('La contraseña debe tener al menos 6 caracteres');
+                return;
+            }
+
+            try {
+                // Check if username already exists
+                const userSnapshot = await database.ref('fenixstore/users/' + username).once('value');
+
+                if (userSnapshot.exists()) {
+                    showAuthError('Este nombre de usuario ya está en uso');
+                    return;
+                }
+
+                // Hash the password
+                const hashedPassword = hashPassword(password);
+
+                // Save user data to database
+                await database.ref('fenixstore/users/' + username).set({
+                    username: username,
+                    password: hashedPassword,
+                    createdAt: new Date().toISOString()
+                });
+
+                // Auto login after registration
+                currentUser = {
+                    username: username,
+                    createdAt: new Date().toISOString()
+                };
+
+                localStorage.setItem('fenixStoreUser', JSON.stringify(currentUser));
+                updateUIForLoggedInUser(username);
+
+                showAuthSuccess('¡Registro exitoso! Bienvenido ' + username);
+                setTimeout(() => {
+                    document.getElementById('authModal').classList.remove('active');
+                    clearAuthForms();
+                }, 1500);
+            } catch (error) {
+                showAuthError('Error al registrarse: ' + error.message);
+            }
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            // Clear user session
+            localStorage.removeItem('fenixStoreUser');
+            currentUser = null;
+            updateUIForLoggedOutUser();
+            mostrarSeccion('homeSection');
+        });
+
+        // Show Upload Section
+        document.getElementById('uploadLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                alert('Debes iniciar sesión para subir juegos');
+                return;
+            }
+            mostrarSeccion('uploadGameSection');
+            loadUserGames();
+        });
+
+        // Upload Game Form Submit
+        document.getElementById('uploadGameForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!currentUser) {
+                showUploadError('Debes iniciar sesión para subir juegos');
+                return;
+            }
+
+            const gameData = {
+                nombre: document.getElementById('gameName').value,
+                imagenBanner: document.getElementById('gameImageBanner').value,
+                imagenTarjeta: document.getElementById('gameImageCard').value,
+                descripcion: document.getElementById('gameDescription').value,
+                categoria: document.getElementById('gameCategory').value,
+                desarrollador: currentUser.username,
+                lanzamiento: new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' }),
+                version: document.getElementById('gameVersion').value,
+                imagenes: [
+                    document.getElementById('gameImage1').value || document.getElementById('gameImageCard').value,
+                    document.getElementById('gameImage2').value || document.getElementById('gameImageCard').value,
+                    document.getElementById('gameImage3').value || document.getElementById('gameImageCard').value
+                ],
+                descripcionCompleta: document.getElementById('gameDescriptionFull').value,
+                enBanner: false,
+                destacado: false,
+                nuevo: true,
+                popular: false,
+                linkDescarga: document.getElementById('gameDownloadLink').value,
+                uploadedBy: currentUser.username,
+                uploadedAt: new Date().toISOString(),
+                publicado: false // Cambiado de approved a publicado
+            };
+
+            try {
+                // Save to Firebase
+                const newGameRef = database.ref('fenixstore/games').push();
+                await newGameRef.set(gameData);
+
+                showUploadSuccess('¡Juego subido exitosamente! Será revisado por un administrador antes de publicarse.');
+                document.getElementById('uploadGameForm').reset();
+                loadUserGames(); // Refresh the list
+
+                setTimeout(() => {
+                    // stays in section or goes home? user said "it doesn't appear", better stay or go home?
+                    // I'll keep the home redirect but now they know why it's not there.
+                    mostrarSeccion('homeSection');
+                }, 3000);
+            } catch (error) {
+                showUploadError('Error al subir el juego: ' + error.message);
+            }
+        });
+
+        // Helper Functions
+        function showAuthError(message) {
+            const errorDiv = document.getElementById('authError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showAuthSuccess(message) {
+            const successDiv = document.getElementById('authSuccess');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showUploadError(message) {
+            const errorDiv = document.getElementById('uploadError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function showUploadSuccess(message) {
+            const successDiv = document.getElementById('uploadSuccess');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+            setTimeout(() => {
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearAuthForms() {
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authSuccess').style.display = 'none';
+        }
+
+        function getErrorMessage(errorCode) {
+            const errorMessages = {
+                'auth/email-already-in-use': 'Este correo ya está registrado',
+                'auth/invalid-email': 'Correo electrónico inválido',
+                'auth/operation-not-allowed': 'Operación no permitida',
+                'auth/weak-password': 'La contraseña es muy débil',
+                'auth/user-disabled': 'Esta cuenta ha sido deshabilitada',
+                'auth/user-not-found': 'Usuario no encontrado',
+                'auth/wrong-password': 'Contraseña incorrecta',
+                'auth/too-many-requests': 'Demasiados intentos. Intenta más tarde'
+            };
+            return errorMessages[errorCode] || 'Error: ' + errorCode;
+        }
+
+        // Load dynamic content from Firebase in real-time
+        function loadGamesFromFirebase() {
+            database.ref('fenixstore/games').orderByChild('publicado').equalTo(true).on('value', (snapshot) => {
+                const firebaseGames = [];
+                snapshot.forEach((childSnapshot) => {
+                    const game = childSnapshot.val();
+                    game.isFirebase = true;
+                    firebaseGames.push(game);
+                });
+
+                // Remove previously added firebase games to avoid duplicates
+                for (let i = juegos.length - 1; i >= 0; i--) {
+                    if (juegos[i].isFirebase) {
+                        juegos.splice(i, 1);
+                    }
+                }
+
+                // Add to the beginning so they appear in the Banner (slice 0,5)
+                juegos.unshift(...firebaseGames);
+
+                if (document.getElementById('homeSection').style.display === 'block') {
+                    cargarContenidoInicio();
+                } else if (document.getElementById('gamesSection').style.display === 'block') {
+                    const activeBtn = document.querySelector('.category-btn.active');
+                    filtrarJuegos(activeBtn ? activeBtn.dataset.category : 'all');
+                }
+            });
+        }
+
+        function loadNewsFromFirebase() {
+            database.ref('fenixstore/news').on('value', (snapshot) => {
+                const firebaseNews = [];
+                snapshot.forEach((childSnapshot) => {
+                    const n = childSnapshot.val();
+                    n.isFirebase = true;
+                    // Compatibility: admin uses textoLargo, index uses textoCompleto
+                    if (!n.textoCompleto && n.textoLargo) n.textoCompleto = n.textoLargo;
+                    firebaseNews.push(n);
+                });
+
+                // Remove previously added firebase news
+                for (let i = noticias.length - 1; i >= 0; i--) {
+                    if (noticias[i].isFirebase) {
+                        noticias.splice(i, 1);
+                    }
+                }
+
+                noticias.push(...firebaseNews);
+
+                // Sort by date (handles both ISO and legacy strings where possible)
+                noticias.sort((a, b) => {
+                    const dateA = new Date(a.fecha);
+                    const dateB = new Date(b.fecha);
+                    if (isNaN(dateA) || isNaN(dateB)) return 0;
+                    return dateB - dateA;
+                });
+
+                if (document.getElementById('homeSection').style.display === 'block') {
+                    cargarSeccionNoticiasInicio('news', noticias);
+                } else if (document.getElementById('noticiasSection').style.display === 'block') {
+                    cargarContenidoNoticias();
+                }
+            });
+        }
+
+        // Load user's games to show status
+        function loadUserGames() {
+            if (!currentUser) return;
+            const myGamesList = document.getElementById('myGamesList');
+
+            database.ref('fenixstore/games').orderByChild('uploadedBy').equalTo(currentUser.username).once('value').then((snapshot) => {
+                myGamesList.innerHTML = '';
+
+                if (!snapshot.exists()) {
+                    myGamesList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">Aún no has subido juegos.</p>';
+                    return;
+                }
+
+                snapshot.forEach((childSnapshot) => {
+                    const game = childSnapshot.val();
+                    const statusClass = game.publicado ? 'status-approved' : 'status-pending';
+                    const statusText = game.publicado ? 'Publicado' : 'Pendiente';
+
+                    const item = document.createElement('div');
+                    item.className = 'my-game-item';
+                    item.innerHTML = `
+                        <span>${game.nombre}</span>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    `;
+                    myGamesList.appendChild(item);
+                });
+            });
+        }
+        // Load events from Firebase
+        function cargarContenidoEventos() {
+            const eventsGrid = document.getElementById('eventsGrid');
+            database.ref('fenixstore/events').once('value').then((snapshot) => {
+                eventsGrid.innerHTML = '';
+                if (!snapshot.exists()) {
+                    eventsGrid.innerHTML = '<p style="color: white; text-align: center; grid-column: 1/-1;">No hay eventos planeados por ahora. ¡Vuelve pronto!</p>';
+                    return;
+                }
+
+                snapshot.forEach((childSnapshot) => {
+                    const event = childSnapshot.val();
+                    const statusMap = {
+                        'proximamente': { text: 'Próximamente', class: 'badge-upcoming' },
+                        'inscripcion': { text: 'Inscripciones Abiertas', class: 'badge-inscripcion' },
+                        'votacion': { text: 'Fase de Votación', class: 'badge-votacion' },
+                        'finalizado': { text: 'Finalizada', class: 'badge-ended' }
+                    };
+                    const currentStatus = statusMap[event.status] || { text: 'Desconocido', class: '' };
+                    const statusClass = currentStatus.class;
+                    const statusText = currentStatus.text;
+
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'event-card';
+                    eventCard.innerHTML = `
+                        <span class="event-badge ${statusClass}">${statusText}</span>
+                        <h3>${event.titulo}</h3>
+                        <span class="event-date">📅 ${event.fecha}</span>
+                        <p class="event-desc">${event.descripcion}</p>
+                        <button class="join-event-btn" onclick="abrirJam('${childSnapshot.key}')">Participar / Ver Jam</button>
+                    `;
+                    eventsGrid.appendChild(eventCard);
+                });
+            });
+        }
+
+        function abrirJam(eventId) {
+            mostrarSeccion('eventDetailsSection');
+            const container = document.getElementById('jamDetailContent');
+
+            database.ref('fenixstore/events/' + eventId).once('value').then((snapshot) => {
+                const jam = snapshot.val();
+                if (!jam) return;
+
+                const statusMap = {
+                    'proximamente': { text: 'Próximamente', class: 'badge-upcoming' },
+                    'inscripcion': { text: 'Inscripciones Abiertas', class: 'badge-inscripcion' },
+                    'votacion': { text: 'Fase de Votación', class: 'badge-votacion' },
+                    'finalizado': { text: 'Finalizada', class: 'badge-ended' }
+                };
+                const currentStatus = statusMap[jam.status] || { text: 'Desconocido', class: '' };
+                const statusClass = currentStatus.class;
+                const statusText = currentStatus.text;
+
+                container.innerHTML = `
+                    <div class="event-details-container">
+                        <input type="hidden" id="currentJamId" value="${eventId}">
+                        <div class="jam-header">
+                            <h2 style="font-size: 32px; margin-bottom: 10px;">${jam.titulo}</h2>
+                            <div class="jam-meta" style="flex-wrap: wrap; justify-content: center;">
+                                <span title="Fecha de inicio">📅 Inicio: ${jam.fecha}</span>
+                                <span style="color: #ef4444; font-weight: bold;">⏳ Fin del evento: ${jam.fechaFinal || 'Pendiente de definir'}</span>
+                                <span class="event-badge ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="jam-stats" id="jamStatsLine" style="justify-content: center; background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 10px; margin-top: 20px;">
+                                <!-- Se llena dinámicamente -->
+                            </div>
+                        </div>
+
+                        <div class="jam-content-grid">
+                            <div class="jam-info-panel">
+                                <h3>Información de la Jam</h3>
+                                <p style="line-height:1.6; opacity:0.9; margin-bottom:20px;">${jam.descripcion}</p>
+                                
+                                <div class="jam-entries-section">
+                                    <h3>Entradas / Juegos Subidos</h3>
+                                    <div id="jamEntriesGrid" class="jam-entries-grid">
+                                        <p>Cargando participaciones...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="jam-submission-panel">
+                                <h3>Subir mi Juego</h3>
+                                 ${!currentUser ?
+                        '<p style="text-align:center; opacity:0.7;">Debes <a href="#" onclick="document.getElementById(\'loginBtn\').click()" style="color:#38bdf8;">iniciar sesión</a> para participar.</p>' :
+                        jam.status !== 'inscripcion' ?
+                            `<p style="text-align:center; opacity:0.7; color:#38bdf8; font-weight:bold;">${jam.status === 'proximamente' ? 'Aún no han empezado las inscripciones.' : 'Las inscripciones están cerradas.'}</p>` :
+                            `
+                                <form id="jamSubmitForm" class="jam-form">
+                                    <input type="hidden" id="jamEventId" value="${eventId}">
+                                    <div class="form-group">
+                                        <input type="text" id="jamGameName" placeholder="Nombre del Juego" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="url" id="jamGameThumb" placeholder="URL Foto de Portada" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="url" id="jamGameLink" placeholder="Link de descarga/jugar" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="text" id="jamGameDesc" placeholder="Breve descripción" required>
+                                    </div>
+                                    <button type="submit" class="btn-submit-jam">Enviar Participación</button>
+                                </form>
+                                `
+                    }
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Cargar juegos ya subidos
+                cargarSubmisionesJam(eventId);
+
+                // Listener para el formulario si existe
+                const form = document.getElementById('jamSubmitForm');
+                if (form) {
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        enviarParticipacionJam(eventId);
+                    });
+                }
+            });
+        }
+
+        function enviarParticipacionJam(eventId) {
+            if (!currentUser) return;
+
+            const submitBtn = document.querySelector('.btn-submit-jam');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Enviando...';
+
+            const gameData = {
+                nombre: document.getElementById('jamGameName').value,
+                thumb: document.getElementById('jamGameThumb').value,
+                link: document.getElementById('jamGameLink').value,
+                desc: document.getElementById('jamGameDesc').value,
+                user: currentUser.username,
+                timestamp: new Date().toISOString()
+            };
+
+            database.ref('fenixstore/jams_submissions/' + eventId).push(gameData).then(() => {
+                alert('¡Felicidades! Tu juego ha sido enviado a la jam.');
+                document.getElementById('jamSubmitForm').reset();
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Participación';
+                cargarSubmisionesJam(eventId); // Recargar lista
+            }).catch(err => {
+                alert('Error al enviar: ' + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Enviar Participación';
+            });
+        }
+
+        function cargarSubmisionesJam(eventId) {
+            const grid = document.getElementById('jamEntriesGrid');
+            database.ref('fenixstore/jams_submissions/' + eventId).on('value', (snapshot) => {
+                grid.innerHTML = '';
+                if (!snapshot.exists()) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; opacity:0.5;">Aún no hay juegos. ¡Sé el primero!</p>';
+                    document.getElementById('jamStatsLine').innerHTML = '🏆 0 Participantes';
+                    return;
+                }
+
+                let entries = [];
+                snapshot.forEach((child) => {
+                    entries.push({ id: child.key, ...child.val() });
+                });
+
+                // Ordenar por votos de mayor a menor
+                entries.sort((a, b) => (b.votesCount || 0) - (a.votesCount || 0));
+
+                document.getElementById('jamStatsLine').innerHTML = `🏆 ${entries.length} Participantes | ⭐ Ranking por Votos`;
+
+                // Necesitamos saber si la Jam está finalizada para el podium
+                database.ref(`fenixstore/events/${eventId}/status`).once('value').then(statusSnap => {
+                    const isFinalized = statusSnap.val() === 'finalizado';
+
+                    entries.forEach((submission, index) => {
+                        const subId = submission.id;
+                        const item = document.createElement('div');
+                        item.className = 'jam-entry-item';
+
+                        // Decoración para el podium en Jams finalizadas
+                        let podiumBadge = '';
+                        if (isFinalized) {
+                            if (index === 0) podiumBadge = '<div class="podium-badge gold">🏆 1º Lugar</div>';
+                            else if (index === 1) podiumBadge = '<div class="podium-badge silver">🥈 2º Lugar</div>';
+                            else if (index === 2) podiumBadge = '<div class="podium-badge bronze">🥉 3º Lugar</div>';
+                        }
+
+                        const votes = submission.votesCount || 0;
+                        item.innerHTML = `
+                            ${podiumBadge}
+                            <img src="${submission.thumb}" alt="${submission.nombre}">
+                            <div class="jam-entry-info-text">
+                                <h4>${submission.nombre}</h4>
+                                <p>Por: <b>${submission.user}</b></p>
+                            </div>
+                            <div class="vote-badge">⭐ ${votes} Votos</div>
+                        `;
+                        item.onclick = () => mostrarDetallesJam(submission, subId, eventId);
+                        grid.appendChild(item);
+                    });
+                });
+            });
+        }
+
+        async function mostrarDetallesJam(submission, subId, eventId) {
+            const currentSections = ['homeSection', 'gamesSection', 'noticiasSection', 'videosSection', 'eventsSection', 'eventDetailsSection', 'nosotrosSection', 'gameDetailsSection'];
+
+            // Fix back button trap: only update lastSection if we are coming from a different section
+            const activeNow = currentSections.find(id => {
+                const el = document.getElementById(id);
+                return el && el.style.display === 'block';
+            });
+            if (activeNow && activeNow !== 'gameDetailsSection') {
+                lastSection = activeNow;
+            }
+
+            // Obtener el estado actual de la jam
+            const jamSnapshot = await database.ref(`fenixstore/events/${eventId}`).once('value');
+            const jam = jamSnapshot.val();
+            const jamStatus = jam ? jam.status : 'finalizado'; // Default to finalizado if jam not found
+
+            // Comprobar estado de voto (PATH FIX: removed spaces)
+            let yaVoto = false;
+            let votoPorId = null;
+
+            if (currentUser) {
+                const votoSnap = await database.ref(`fenixstore/jams_votes/${eventId}/${currentUser.username}`).once('value');
+                if (votoSnap.exists()) {
+                    yaVoto = true;
+                    votoPorId = votoSnap.val();
+                }
+            }
+
+            currentSections.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = id === 'gameDetailsSection' ? 'block' : 'none';
+            });
+
+            const gameDetailsSection = document.getElementById('gameDetailsSection');
+            const votesCount = submission.votesCount || 0;
+
+            gameDetailsSection.innerHTML = `
+                <div class="game-details-header">
+                    <img src="${submission.thumb}" alt="${submission.nombre}">
+                    <div class="game-details-info">
+                        <h2 style="color: #38bdf8;">${submission.nombre}</h2>
+                        <p style="color: white;"><strong>Desarrollador:</strong> ${submission.user}</p>
+                        <p style="color: white;"><strong>Tipo:</strong> Participación de Jam</p>
+                        <div class="vote-count-detail">⭐ ${votesCount} Votos en total</div>
+                    </div>
+                </div>
+                <div class="game-details-description" style="color: white;">
+                    <h3 style="color: #38bdf8;">Sobre esta participación</h3>
+                    <p>${submission.desc}</p>
+                </div>
+                
+                <div id="voteArea" style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; margin-top:20px;">
+                    <h4 style="color:#38bdf8; margin-bottom:10px;">Votación</h4>
+                    ${jamStatus !== 'votacion' ?
+                    `<p style="color: #888;">${jamStatus === 'inscripcion' ? 'La fase de votación comenzará pronto. ¡Espera a que cierren las inscripciones!' : 'Las votaciones están cerradas.'}</p>` :
+                    (!currentUser ?
+                        '<p style="color: #888;">Inicia sesión para votar por este proyecto.</p>' :
+                        yaVoto ?
+                            (votoPorId === subId ?
+                                '<p style="color: #28a745; font-weight:bold;">✅ Has votado por este juego</p>' :
+                                '<p style="color: #888;">Ya has usado tu voto en esta Jam.</p>') :
+                            `<button class="btn-vote" onclick="enviarVotoJam('${eventId}', '${subId}')">DAR MI VOTO A ESTE JUEGO</button>`)
+                }
+                </div>
+
+                <button class="download-btn" style="background: #38bdf8; color: #0f172a; margin-top:20px;" onclick="window.open('${submission.link}', '_blank')">Jugar / Ver Proyecto</button>
+                <button class="close-btn" onclick="cerrarDetallesJuego()">Atrás</button>
+            `;
+        }
+
+        async function enviarVotoJam(eventId, subId) {
+            if (!currentUser) return;
+
+            // Bloqueo preventivo de doble clic
+            const btn = document.querySelector('.btn-vote');
+            if (btn) btn.disabled = true;
+
+            try {
+                // 0. Doble verificación de voto (Servidor/Seguridad)
+                const checkVoto = await database.ref(`fenixstore/jams_votes/${eventId}/${currentUser.username}`).once('value');
+                if (checkVoto.exists()) {
+                    alert('Error: Ya has utilizado tu voto en esta Jam.');
+                    location.reload(); // Forzar refresco si hay desincronía
+                    return;
+                }
+
+                // 1. Registrar el voto del usuario para impedir duplicados en la Jam
+                await database.ref(`fenixstore/jams_votes/${eventId}/${currentUser.username}`).set(subId);
+
+                // 2. Incrementar el contador en la participación (Usando transacción para evitar fallos de concurrencia)
+                const voteRef = database.ref(`fenixstore/jams_submissions/${eventId}/${subId}/votesCount`);
+                await voteRef.transaction((current) => {
+                    return (current || 0) + 1;
+                });
+
+                alert('¡Voto registrado con éxito!');
+
+                // Actualizar la vista de detalles sin perder el "lastSection" original
+                const subSnap = await database.ref(`fenixstore/jams_submissions/${eventId}/${subId}`).once('value');
+                mostrarDetallesJam(subSnap.val(), subId, eventId);
+
+            } catch (error) {
+                alert('Error al votar: ' + error.message);
+                if (btn) btn.disabled = false;
+            }
+        }
+        // Original game data
+
+        const juegos = [
+            {
+                nombre: "Crab Maze",
+                imagenBanner: "img/crazebanner.png",
+                imagenTarjeta: "img/craze.png",
+                descripcion: "Un laberinto desafiante donde solo los más precisos alcanzan la meta.",
+                categoria: "Laberintos",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0",
+                imagenes: [
+                    "img/craze.png",
+                    "img/craze2.png",
+                    "img/craze3.png"
+                ],
+                descripcionCompleta: "Crab Maze es un juego de precisión donde solo tu destreza con el mouse te llevará a la victoria. Navega por intrincados laberintos sin salirte del camino, o perderás al instante. Con un diseño inspirado en la playa y los cangrejos, cada movimiento cuenta mientras intentas alcanzar la meta. ¿Tienes el pulso firme para superar el desafío sin equivocarte?",
+                enBanner: true,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/n0qkc1qphyfnpnc/CRAB_MAZE.ppsx/file"
+            },
+            {
+                nombre: "5 Seconds",
+                imagenBanner: "img/5seconds.png",
+                imagenTarjeta: "img/5seconds.png",
+                descripcion: "Haz clic en los objetivos antes de que el tiempo se agote. ¡Piensa rápido!",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0",
+                imagenes: [
+                    "img/5S1.png",
+                    "img/5S2.png",
+                    "img/5S3.png"
+                ],
+                descripcionCompleta: "En 5 Seconds, cada segundo cuenta. Encuentra y haz clic en los cuadros negros antes de que el tiempo llegue a cero. A medida que avanzas, el desafío se vuelve más intenso y cada decisión debe ser rápida y precisa. Pon a prueba tus reflejos y tu velocidad en este adictivo juego de reacción.",
+                enBanner: true,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/rs6u55m8krnpsju/5_Seconds.ppsx/file"
+            },
+            {
+                nombre: "Fortnite PPT OG",
+                imagenBanner: "img/fortnite-og.jpg",
+                imagenTarjeta: "img/fortniteog.jpg",
+                descripcion: "Lucha por tu vida en un campo de batalla lleno de sorpresas y acción.",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0.2 (Beta)",
+                imagenes: [
+                    "img/for1.png",
+                    "img/for2.png",
+                    "img/for3.png"
+                ],
+                descripcionCompleta: "En Fortnite PPT, te sumerges en un campo de batalla lleno de acción donde tu objetivo es ser el último en pie. Deberás construir refugios, recoger recursos y enfrentarte a otros jugadores en una isla donde solo los más astutos sobrevivirán. La estrategia, la rapidez y la habilidad para construir son clave para superar a tus oponentes y ganar la partida.",
+                enBanner: true,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/5s07ujwy8ibgstj/Fortnite_OG_PPT.zip/file"
+            },
+            {
+                nombre: "JETPACK JOYRIDE PPT",
+                imagenBanner: "img/jetpackbanner.png",
+                imagenTarjeta: "img/jetpacklogo.png",
+                descripcion: "Evita los obstáculos y supera la mayor distancia posible.",
+                categoria: "Acción",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "0.5 (Demo)",
+                imagenes: [
+                    "img/jet1.png",
+                    "img/jet2.png",
+                    "img/jet3.png"
+                ],
+                descripcionCompleta: "Vuela a través de un mundo de obstáculos en Jetpack Joirride, un juego que desafía tu capacidad para esquivar y sobrevivir. Mientras avanzas, te enfrentas a obstáculos cada vez más complejos, que ponen a prueba tu agilidad y reflejos. El ritmo se acelera, lo que hace que cada decisión sea más crucial. Con cada intento, tu habilidad para adaptarte y reaccionar te llevará más lejos en este emocionante desafío aéreo.",
+                enBanner: true,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/vj9g4368lkdcl2f/mouse_joirride.ppsx/file"
+            },
+            {
+                nombre: "Fenix Os Mobile",
+                imagenBanner: "img/Fenixmobilebanner.png",
+                imagenTarjeta: "img/FenixMobile.png",
+                descripcion: "Explora un sistema operativo único con un diseño fluido y animaciones dinámicas.",
+                categoria: "Sistemas",
+                desarrollador: "El Papitas",
+                lanzamiento: "9 de Marzo de 2025",
+                version: "1.0.1 (Demo)",
+                imagenes: [
+                    "img/FM1.png",
+                    "img/FM2.png",
+                    "img/FM3.png"
+                ],
+                descripcionCompleta: "Te presentamos Fénix Mobile, un sistema operativo único creado en PowerPoint, pensado para ofrecer una experiencia visual impecable. Su diseño es limpio, elegante y moderno, con una interfaz intuitiva que facilita la navegación. Las animaciones fluidas en cada sección hacen que explorar el sistema sea una experiencia dinámica y atractiva.",
+                enBanner: true,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/cxpvprywe43ag77/Fenix_movile_demo.ppsx/file"
+            },
+            {
+                nombre: "Fenix Os Mobile P",
+                imagenBanner: "img/Fenixmobilebanner.png",
+                imagenTarjeta: "img/FenixMobileP.png",
+                descripcion: "Un sistema compacto y optimizado que ofrece una experiencia fluida y elegante en relojes.",
+                categoria: "Sistemas",
+                desarrollador: "El Papitas",
+                lanzamiento: "10 de Marzo de 2025",
+                version: "0.5 (Demo)",
+                imagenes: [
+                    "img/FMP1.png",
+                    "img/FMP2.png",
+                    "img/FMP3.png"
+                ],
+                descripcionCompleta: "Te presentamos Fénix Mobile P, la versión portátil de Fénix Mobile OS, diseñada específicamente para relojes. Esta adaptación mantiene el diseño elegante y moderno de la versión original, pero optimizado para pantallas más pequeñas, asegurando una experiencia fluida y accesible. Con animaciones suaves y una interfaz simplificada, Fénix Mobile P permite una navegación intuitiva sin sacrificar el estilo ni la funcionalidad. Su rendimiento está pensado para ser ágil, ofreciendo un arranque rápido y una experiencia visual atractiva. Si buscas un sistema compacto, innovador y diseñado para la portabilidad, Fénix Mobile P es la opción ideal..",
+                enBanner: false,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/h9qnf9equ7abiy7/Fenix_mobile_P_demo.ppsx/file"
+            },
+            {
+                nombre: "Fenix Os",
+                imagenBanner: "img/Fenixmobilebanner.png",
+                imagenTarjeta: "img/FenixOs.png",
+                descripcion: "Un sistema operativo moderno con animaciones fluidas y una experiencia visual envolvente.",
+                categoria: "Sistemas",
+                desarrollador: "El Papitas",
+                lanzamiento: "11 de Marzo de 2025",
+                version: "2.0",
+                imagenes: [
+                    "img/FNX1.png",
+                    "img/FNX2.png",
+                    "img/FNX3.png"
+                ],
+                descripcionCompleta: "Fénix OS es un sistema operativo innovador creado en PowerPoint, diseñado para ofrecer una experiencia visual moderna y dinámica. Con una interfaz fluida y bien estructurada, este sistema destaca por su diseño atractivo y su facilidad de uso. Entre sus características principales se encuentra Fenix Store, una tienda de juegos PPT donde cada título cuenta con la autorización de sus creadores originales. Además, Fénix OS no requiere macros, garantizando una ejecución segura y sin complicaciones. Su arranque es rápido y no necesita instalación, lo que permite un acceso inmediato a sus funciones.",
+                enBanner: false,
+                destacado: true,
+                nuevo: false,
+                popular: false,
+                linkDescarga: "https://www.mediafire.com/file/x4k5rbhddbefe1o/Fenix_os_2.0.ppsx/file"
+            }
+        ];
+
+        const noticias = [
+            {
+                titulo: "Nuevos Juegos del Papitas",
+                imagen: "img/noti.png",
+                textoCorto: "Inesperado regreso del papitas a los juegos ppt",
+                textoCompleto: "Después de varios meses de ausencia, el reconocido desarrollador El Papitas ha regresado con grandes novedades. No solo ha vuelto con uno o dos juegos, sino con ¡cinco increíbles títulos! Además, para hacer aún más emocionante su regreso, ha lanzado estos juegos en su nueva tienda en línea, Fenix Store, donde los jugadores podrán acceder a ellos fácilmente. ",
+                fecha: "9 de Marzo de 2025"
+            },
+            {
+                titulo: "Fenix Os Mobile",
+                imagen: "img/FenixMobile.png",
+                textoCorto: "Demo de Fenix mobile",
+                textoCompleto: "El desarrollador El Papitas ha sorprendido a la comunidad con el lanzamiento de Fenix OS Mobile en su nueva tienda en línea. Esta versión del sistema operativo, que muchos pensaban que nunca vería la luz, finalmente ha sido publicada, dejando a todos sorprendidos. Con el lanzamiento de Fenix Mobile en su versión 1.0.1 (Demo), El Papitas demuestra su habilidad para sorprender y deleitar a sus seguidores. Esta versión inicial promete ofrecer una experiencia única, y los usuarios ahora tienen la oportunidad de probarla a través de la tienda Fenix Store.",
+                fecha: "9 de Marzo de 2025"
+            },
+            {
+                titulo: "ppia/bellaco69",
+                imagen: "img/paia.png",
+                textoCorto: "Papia es bellaco 69?",
+                textoCompleto: "Si, si son la misma persona, esto se puede comprobar al ver el juego llamado (Crab Maze), El cual fue mostrado por bellaco a administradores de la comunidad, y al verlo en el sitio web de Fenix Store, se puede ver que el autor es nada mas y nada menos que El Papitas, confirmando que bellaco69, y papia son la misma persona.",
+                fecha: "05 de Marzo de 2025"
+            }
+        ];
+
+        let lastSection = 'homeSection';
+
+        function cargarContenidoInicio() {
+            const bannerSlides = document.getElementById('bannerSlides');
+            bannerSlides.innerHTML = '';
+            juegos.filter(juego => juego.enBanner).slice(0, 5).forEach(juego => {
+                const slide = document.createElement('div');
+                slide.className = 'banner-slide';
+                slide.innerHTML = `
+                    <img src="${juego.imagenBanner}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                `;
+                bannerSlides.appendChild(slide);
+            });
+
+            cargarSeccion('featuredGames', juegos.filter(juego => juego.destacado));
+            cargarSeccion('newGames', juegos.filter(juego => juego.nuevo));
+            cargarSeccion('popularGames', juegos.filter(juego => juego.popular));
+            cargarSeccionNoticiasInicio('news', noticias);
+            document.getElementById('ads').innerHTML = '';
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            let currentSlide = 0;
+            const totalSlides = bannerSlides.children.length;
+
+            function updateBanner() {
+                bannerSlides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            }
+
+            nextBtn.addEventListener('click', () => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateBanner();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                updateBanner();
+            });
+
+            setInterval(() => {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                updateBanner();
+            }, 5000);
+        }
+
+        function cargarSeccion(sectionId, juegosFiltrados) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+            juegosFiltrados.forEach(juego => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                    <p>${juego.descripcion}</p>
+                    ${juego.nuevo ? '<span class="nuevo-tag">Nuevo</span>' : ''}
+                `;
+                card.addEventListener('click', () => mostrarDetallesJuego(juego));
+                section.appendChild(card);
+            });
+        }
+
+        function cargarSeccionNoticiasInicio(sectionId, noticiasFiltradas) {
+            const section = document.getElementById(sectionId);
+            section.innerHTML = '';
+            noticiasFiltradas.forEach(noticia => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                    <h3>${noticia.titulo}</h3>
+                    <p>${noticia.textoCorto}</p>
+                `;
+                card.addEventListener('click', () => mostrarSeccion('noticiasSection'));
+                section.appendChild(card);
+            });
+        }
+
+        function cargarContenidoCategorias() {
+            filtrarJuegos('all');
+        }
+
+        function cargarContenidoNoticias() {
+            const noticiasGrid = document.getElementById('noticiasGrid');
+            noticiasGrid.innerHTML = '';
+            noticias.forEach(noticia => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                    <h3>${noticia.titulo}</h3>
+                    <p>${noticia.textoCorto}</p>
+                `;
+                card.addEventListener('click', () => mostrarDetallesNoticia(noticia));
+                noticiasGrid.appendChild(card);
+            });
+        }
+
+        function mostrarDetallesJuego(juego) {
+            const sections = ['homeSection', 'gamesSection', 'noticiasSection', 'videosSection', 'nosotrosSection', 'gameDetailsSection'];
+            lastSection = sections.find(id => document.getElementById(id).style.display === 'block') || 'homeSection';
+            sections.forEach(id => document.getElementById(id).style.display = id === 'gameDetailsSection' ? 'block' : 'none');
+
+            const gameDetailsSection = document.getElementById('gameDetailsSection');
+            gameDetailsSection.innerHTML = `
+                <div class="game-details-header">
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <div class="game-details-info">
+                        <h2>${juego.nombre}</h2>
+                        <p><strong>Desarrollador:</strong> ${juego.desarrollador}</p>
+                        <p><strong>Lanzamiento:</strong> ${juego.lanzamiento}</p>
+                        <p><strong>Versión:</strong> ${juego.version}</p>
+                        <p><strong>Categoría:</strong> ${juego.categoria}</p>
+                    </div>
+                </div>
+                <div class="game-details-images">
+                    <h3>Imágenes</h3>
+                    <div class="game-details-images-grid">
+                        ${juego.imagenes.map(img => `<img src="${img}" alt="${juego.nombre} imagen">`).join('')}
+                    </div>
+                </div>
+                <div class="game-details-description">
+                    <h3>Descripción</h3>
+                    <p>${juego.descripcionCompleta}</p>
+                </div>
+                <button class="download-btn" onclick="window.location.href='${juego.linkDescarga}'">Descargar Ahora</button>
+                <button class="close-btn" onclick="cerrarDetallesJuego()">Atrás</button>
+            `;
+        }
+
+        function mostrarDetallesNoticia(noticia) {
+            const sections = ['homeSection', 'gamesSection', 'noticiasSection', 'videosSection', 'nosotrosSection', 'gameDetailsSection'];
+            lastSection = sections.find(id => document.getElementById(id).style.display === 'block') || 'noticiasSection';
+            sections.forEach(id => document.getElementById(id).style.display = id === 'gameDetailsSection' ? 'block' : 'none');
+
+            const gameDetailsSection = document.getElementById('gameDetailsSection');
+            gameDetailsSection.innerHTML = `
+                <div class="game-details-header">
+                    <div class="game-details-info">
+                        <h2>${noticia.titulo}</h2>
+                        <p><strong>Fecha:</strong> ${noticia.fecha}</p>
+                    </div>
+                </div>
+                <div class="game-details-description">
+                    <h3>Detalles</h3>
+                    <p>${noticia.textoCompleto || noticia.textoLargo}</p>
+                </div>
+                <img src="${noticia.imagen}" alt="${noticia.titulo}" class="noticia-imagen-grande">
+                <button class="close-btn" onclick="cerrarDetallesJuego()">Atrás</button>
+            `;
+        }
+
+        function cerrarDetallesJuego() {
+            mostrarSeccion(lastSection);
+        }
+
+        function filtrarJuegos(categoria, terminoBusqueda = '') {
+            const gamesGrid = document.getElementById('gamesGrid');
+            gamesGrid.innerHTML = '';
+            let juegosFiltrados = categoria === 'all' ? juegos : juegos.filter(juego => juego.categoria === categoria);
+
+            if (terminoBusqueda) {
+                juegosFiltrados = juegosFiltrados.filter(juego =>
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda) ||
+                    juego.categoria.toLowerCase().includes(terminoBusqueda)
+                );
+            }
+
+            juegosFiltrados.forEach(juego => {
+                const gameCard = document.createElement('div');
+                gameCard.className = 'game-card';
+                gameCard.innerHTML = `
+                    <img src="${juego.imagenTarjeta}" alt="${juego.nombre}">
+                    <h3>${juego.nombre}</h3>
+                    <p>${juego.descripcion}</p>
+                    ${juego.nuevo ? '<span class="nuevo-tag">Nuevo</span>' : ''}
+                    <button onclick="window.location.href='${juego.linkDescarga}'">Descargar</button>
+                `;
+                gameCard.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') mostrarDetallesJuego(juego);
+                });
+                gamesGrid.appendChild(gameCard);
+            });
+        }
+
+        const sections = {
+            homeSection: cargarContenidoInicio,
+            gamesSection: cargarContenidoCategorias,
+            noticiasSection: cargarContenidoNoticias,
+            videosSection: () => { },
+            eventsSection: cargarContenidoEventos,
+            eventDetailsSection: () => { },
+            nosotrosSection: () => { },
+            gameDetailsSection: () => { },
+            uploadGameSection: () => { }
+        };
+
+        function mostrarSeccion(seccionId) {
+            Object.keys(sections).forEach(id => {
+                document.getElementById(id).style.display = id === seccionId ? 'block' : 'none';
+            });
+            if (sections[seccionId]) sections[seccionId]();
+        }
+
+        document.getElementById('homeLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('homeSection'); });
+        document.getElementById('categoriesLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('gamesSection'); });
+        document.getElementById('noticiasLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('noticiasSection'); });
+        document.getElementById('videosLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('videosSection'); });
+        document.getElementById('eventsLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('eventsSection'); });
+        document.getElementById('nosotrosLink').addEventListener('click', (e) => { e.preventDefault(); mostrarSeccion('nosotrosSection'); });
+        document.getElementById('exploreMore').addEventListener('click', () => mostrarSeccion('gamesSection'));
+
+        document.getElementById('searchInput').addEventListener('input', function () {
+            const terminoBusqueda = this.value.toLowerCase();
+            const categoriaActiva = document.querySelector('.category-btn.active').dataset.category;
+            filtrarJuegos(categoriaActiva, terminoBusqueda);
+        });
+
+        document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                const categoria = this.dataset.category;
+                const terminoBusqueda = document.getElementById('searchInput').value.toLowerCase();
+                filtrarJuegos(categoria, terminoBusqueda);
+            });
+        });
+
+        document.getElementById('gameSearch').addEventListener('input', function () {
+            const terminoBusqueda = this.value.toLowerCase();
+            const currentSection = Object.keys(sections).find(id => document.getElementById(id).style.display === 'block');
+
+            if (currentSection === 'homeSection') {
+                cargarSeccion('featuredGames', juegos.filter(juego => juego.destacado && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccion('newGames', juegos.filter(juego => juego.nuevo && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccion('popularGames', juegos.filter(juego => juego.popular && (
+                    juego.nombre.toLowerCase().includes(terminoBusqueda) ||
+                    juego.descripcion.toLowerCase().includes(terminoBusqueda)
+                )));
+                cargarSeccionNoticiasInicio('news', noticias.filter(noticia => (
+                    noticia.titulo.toLowerCase().includes(terminoBusqueda) ||
+                    noticia.textoCorto.toLowerCase().includes(terminoBusqueda)
+                )));
+                document.getElementById('ads').innerHTML = '';
+            } else if (currentSection === 'gamesSection') {
+                const categoriaActiva = document.querySelector('.category-btn.active').dataset.category;
+                filtrarJuegos(categoriaActiva, terminoBusqueda);
+            } else if (currentSection === 'noticiasSection') {
+                const noticiasGrid = document.getElementById('noticiasGrid');
+                noticiasGrid.innerHTML = '';
+                noticias.filter(noticia => (
+                    noticia.titulo.toLowerCase().includes(terminoBusqueda) ||
+                    noticia.textoCorto.toLowerCase().includes(terminoBusqueda)
+                )).forEach(noticia => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <img src="${noticia.imagen}" alt="${noticia.titulo}">
+                        <h3>${noticia.titulo}</h3>
+                        <p>${noticia.textoCorto}</p>
+                    `;
+                    card.addEventListener('click', () => mostrarDetallesNoticia(noticia));
+                    noticiasGrid.appendChild(card);
+                });
+            }
+
+            if (!terminoBusqueda) {
+                if (currentSection === 'homeSection') cargarContenidoInicio();
+                else if (currentSection === 'gamesSection') filtrarJuegos(document.querySelector('.category-btn.active').dataset.category);
+                else if (currentSection === 'noticiasSection') cargarContenidoNoticias();
+            }
+        });
+
+        const videoPlayer = document.getElementById('videoPlayer').querySelector('iframe');
+        document.querySelectorAll('.video-card').forEach(card => {
+            card.addEventListener('click', function () {
+                const videoId = this.dataset.videoId;
+                videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            });
+        });
+
+        cargarContenidoInicio();
+        mostrarSeccion('homeSection');
+        loadGamesFromFirebase();
+        loadNewsFromFirebase();
+    </script>
+</body>
+
+</html>
