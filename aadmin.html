@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Fenix Store</title>
+    <link rel="icon" type="image/png" href="img/fenixstorelogo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 20px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        h1 {
+            color: #38bdf8;
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .admin-btn {
+            background: linear-gradient(135deg, #38bdf8, #3b82f6);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(56, 189, 248, 0.5);
+            background: linear-gradient(135deg, #3b82f6, #38bdf8);
+        }
+
+        .admin-btn:active {
+            transform: translateY(-2px);
+        }
+
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-container.active {
+            display: flex;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            /* Evita que se pueda hacer clic en el video */
+        }
+
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #38bdf8;
+            border-radius: 50%;
+            animation: particle-float 10s infinite;
+            opacity: 0.6;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.6;
+            }
+
+            90% {
+                opacity: 0.6;
+            }
+
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .warning {
+            color: #fbbf24;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <img src="img/fenixstorelogo.png" alt="Fenix Store Logo" class="logo">
+        <h1><i class="fas fa-shield-halved"></i> Panel de Administración</h1>
+        <p>Acceso exclusivo para administradores</p>
+        <button class="admin-btn" onclick="accessPanel()">
+            <i class="fas fa-lock-open"></i>
+            Ingresar al Panel
+        </button>
+        <p class="warning">⚠️ Acceso restringido</p>
+    </div>
+
+    <div class="video-container" id="videoContainer">
+        <video id="trollVideo" loop>
+            <source src="assets/Rick Roll.mp4" type="video/mp4">
+            Tu navegador no soporta el elemento de video.
+        </video>
+    </div>
+
+    <script>
+        // Crear partículas flotantes
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        createParticles();
+
+        function accessPanel() {
+            const videoContainer = document.getElementById('videoContainer');
+            const video = document.getElementById('trollVideo');
+
+            videoContainer.classList.add('active');
+            video.play();
+
+            // Intentar poner en pantalla completa
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen();
+            } else if (videoContainer.webkitRequestFullscreen) {
+                videoContainer.webkitRequestFullscreen();
+            } else if (videoContainer.msRequestFullscreen) {
+                videoContainer.msRequestFullscreen();
+            }
+        }
+
+        function closeVideo() {
+            const videoContainer = document.getElementById('videoContainer');
+            const video = document.getElementById('trollVideo');
+
+            videoContainer.classList.remove('active');
+            video.pause();
+            video.currentTime = 0;
+
+            // Salir de pantalla completa si está activa
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // Cerrar con tecla ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeVideo();
+            }
+        });
+
+        // MODO TROLL EXTREMO 😈
+        const video = document.getElementById('trollVideo');
+
+        // Prevenir pausa SIEMPRE
+        video.addEventListener('pause', () => {
+            if (document.getElementById('videoContainer').classList.contains('active')) {
+                video.play();
+            }
+        });
+
+        // Prevenir que se detenga el video
+        video.addEventListener('ended', () => {
+            video.currentTime = 0;
+            video.play();
+        });
+
+        // Prevenir clic derecho en el video
+        video.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // Prevenir que se pueda pausar con la barra espaciadora
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && document.getElementById('videoContainer').classList.contains('active')) {
+                e.preventDefault();
+                video.play();
+            }
+        });
+
+        // Asegurar que el video siempre esté reproduciéndose
+        setInterval(() => {
+            if (document.getElementById('videoContainer').classList.contains('active') && video.paused) {
+                video.play();
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>
