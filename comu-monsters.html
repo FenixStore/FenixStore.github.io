@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comu Monsters - Fenix Games</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --accent-color: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --hp-green: #22c55e;
+            --hp-yellow: #eab308;
+            --hp-red: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: white;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #game-container {
+            position: relative;
+            width: 1000px;
+            height: 650px;
+            background: #000;
+            border: 2px solid var(--accent-color);
+            border-radius: 24px;
+            box-shadow: 0 0 50px rgba(245, 158, 11, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- STYLES FOR MAIN MENU --- */
+        #main-menu {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+            background: rgba(15, 23, 42, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .menu-title {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #f59e0b, #f97316);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.4));
+        }
+
+        .menu-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.7;
+            margin-bottom: 40px;
+        }
+
+        .menu-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-8px);
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2);
+        }
+
+        .menu-card i {
+            font-size: 2.2rem;
+            color: var(--accent-color);
+        }
+
+        .menu-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .menu-card p {
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .auth-modal {
+            background: var(--secondary-bg);
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-color);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .auth-modal h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .shop-item h4 {
+            color: var(--accent-color);
+            margin: 0;
+        }
+
+        .shop-item p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin: 0;
+            flex: 1;
+        }
+
+        .price {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        /* --- SKILLS BOOK --- */
+        .book-modal {
+            background: #d4b483;
+            background-image: url('https://www.transparenttextures.com/patterns/paper.png');
+            width: 800px;
+            height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), inset 0 0 100px rgba(0, 0, 0, 0.2);
+            display: flex;
+            padding: 20px;
+            position: relative;
+            border: 15px solid #5d4037;
+        }
+
+        .book-modal::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 2;
+        }
+
+        .book-page {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            color: #3e2723;
+        }
+
+        .book-title {
+            font-family: 'Outfit', serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #5d4037;
+            padding-bottom: 10px;
+        }
+
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .skill-slot {
+            background: rgba(255, 255, 255, 0.4);
+            border: 2px dashed #5d4037;
+            border-radius: 12px;
+            height: 90px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .skill-slot.equipped {
+            background: white;
+            border-style: solid;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .skill-slot i {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .skill-slot span {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .slot-empty {
+            opacity: 0.3;
+        }
+
+        .slot-empty::after {
+            content: '?';
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        /* --- HUD --- */
+        .header-stats {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            display: flex;
+            gap: 15px;
+            z-index: 101;
+        }
+
+        .stat-item {
+            background: rgba(15, 23, 42, 0.8);
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .stat-item.level {
+            border-color: #8b5cf6;
+        }
+
+        .stat-item.level i {
+            color: #8b5cf6;
+        }
+
+        .stat-item.coins img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* --- BATTLE SCREEN --- */
+        #battle-screen {
+            flex: 1;
+            position: relative;
+            background: url('https://img.freepik.com/free-vector/pixel-art-mystical-landscape-background_52683-108154.jpg?t=st=1721066442~exp=1721070042~hmac=8072719656845258925526002525544252554425255442525544252554425255');
+            background-size: cover;
+            background-position: center;
+            display: none;
+            flex-direction: column;
+        }
+
+        #battle-screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.4);
+            z-index: 0;
+        }
+
+        .battle-scene {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Layout de Combate */
+        .opponent-area {
+            position: absolute;
+            top: 50px;
+            right: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .player-area {
+            position: absolute;
+            bottom: 40px;
+            left: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .monster-box {
+            width: 250px;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .monster-img {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        .monster-pfp {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1e293b;
+            padding: 12px 18px;
+            border-radius: 12px;
+            width: 280px;
+            border: 4px solid #475569;
+            box-shadow: 0 6px 0 #1e293b;
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .hp-bar-container {
+            height: 14px;
+            background: #475569;
+            border-radius: 7px;
+            overflow: hidden;
+            border: 2px solid #1e293b;
+        }
+
+        .hp-bar-fill {
+            height: 100%;
+            width: 100%;
+            background: var(--hp-green);
+            transition: width 0.5s ease;
+        }
+
+        .hp-text {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        /* Control Panel */
+        #control-panel {
+            height: 180px;
+            background: #334155;
+            border-top: 6px solid #1e293b;
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .battle-log {
+            flex: 1;
+            background: #1e293b;
+            border: 4px solid #475569;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .action-grid {
+            width: 380px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: #f1f5f9;
+            border: 4px solid #475569;
+            border-radius: 10px;
+            color: #1e293b;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 0 #94a3b8;
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #92400e;
+        }
+
+        .action-btn:active:not(:disabled) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #92400e;
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* --- SHOP / PVP MODALS --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .auth-modal {
+            background: var(--primary-bg);
+            padding: 30px;
+            border-radius: 24px;
+            border: 1px solid var(--accent-color);
+            width: 500px;
+            text-align: center;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .shop-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+        }
+
+        .shop-item h4 {
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+
+        .shop-item p {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            height: 40px;
+        }
+
+        .shop-item .price {
+            font-weight: 800;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            gap: 5px;
+        }
+
+        /* User Profile Badge - Interactive Bubble */
+        #user-profile-badge {
+            display: none;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid var(--accent-color);
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            gap: 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 101;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: auto;
+            width: 54px;
+            height: 54px;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #user-profile-badge:hover {
+            width: auto;
+            max-width: 350px;
+            height: auto;
+            min-height: 54px;
+            padding: 7px 20px 7px 7px;
+            gap: 15px;
+            border-radius: 18px;
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .user-avatar-container {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .user-avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--accent-color);
+        }
+
+        .user-deco-img {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 54px;
+            height: 54px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .user-info-text {
+            text-align: left;
+            opacity: 0;
+            transform: translateX(-15px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        #user-profile-badge:hover .user-info-text {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        .user-name-display {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: white;
+            display: block;
+            margin-bottom: -1px;
+        }
+
+        .user-record-display {
+            font-size: 0.75rem;
+            color: #fbbf24;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+
+        /* XP System Styles */
+        .user-xp-container {
+            margin-top: 6px;
+            width: 140px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .user-xp-bar {
+            height: 100%;
+            background: linear-gradient(to right, #8b5cf6, #d946ef);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 10px rgba(217, 70, 239, 0.5);
+        }
+
+        .user-level-tag {
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
+            color: white;
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes michibomb {
+            0% {
+                transform: translate(20px, 20px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+
+            30% {
+                opacity: 1;
+                transform: translate(300px, 50px) rotate(180deg) scale(1.5);
+            }
+
+            100% {
+                transform: translate(600px, 180px) rotate(720deg) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(3);
+                opacity: 1;
+                filter: brightness(2);
+            }
+
+            100% {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes fenixRise {
+            0% {
+                transform: translate(300px, 400px) scale(0) rotate(0deg);
+                filter: hue-rotate(0deg) brightness(2);
+                opacity: 0;
+            }
+
+            50% {
+                transform: translate(450px, 100px) scale(1.5) rotate(360deg);
+                filter: hue-rotate(45deg) brightness(3);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(600px, 180px) scale(1) rotate(720deg);
+                filter: hue-rotate(0deg) brightness(1);
+                opacity: 0;
+            }
+        }
+
+        .fenix-projectile {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            filter: drop-shadow(0 0 20px #f59e0b);
+        }
+
+        .anim-fenix {
+            display: block !important;
+            animation: fenixRise 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .explosion-effect {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 0%, #fbbf24 40%, #ef4444 80%, transparent 100%);
+            border-radius: 50%;
+            z-index: 1000;
+            display: none;
+            pointer-events: none;
+            box-shadow: 0 0 50px #ef4444;
+        }
+
+        .shield-effect {
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            border: 5px solid #38bdf8;
+            border-radius: 50%;
+            background: rgba(56, 189, 248, 0.2);
+            box-shadow: 0 0 30px #38bdf8, inset 0 0 20px #38bdf8;
+            z-index: 10;
+            display: none;
+            pointer-events: none;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scale(1.1);
+            animation: pulse-shield 1.5s infinite;
+        }
+
+        @keyframes pulse-shield {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+                opacity: 1;
+            }
+        }
+
+        .anim-explode {
+            display: block !important;
+            animation: explode 0.5s ease-out forwards;
+        }
+
+        .michibomb-projectile {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 999;
+            display: none;
+            pointer-events: none;
+            top: 0;
+            left: 0;
+        }
+
+        .anim-michibomb {
+            display: block !important;
+            animation: michibomb 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        /* Animations */
+        @keyframes attack {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(50px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes attackOpponent {
+            0% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-50px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            20% {
+                transform: translate(-5px, 0);
+            }
+
+            40% {
+                transform: translate(5px, 0);
+            }
+
+            60% {
+                transform: translate(-5px, 0);
+            }
+
+            80% {
+                transform: translate(5px, 0);
+            }
+        }
+
+        .anim-attack {
+            animation: attack 0.4s ease-in-out;
+        }
+
+        .anim-attack-opponent {
+            animation: attackOpponent 0.4s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* --- AUDIO CONTROL --- */
+        #mute-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid var(--accent-color);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+
+        #mute-btn:hover {
+            transform: scale(1.1);
+            background: var(--accent-color);
+            color: #0f172a;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <!-- HUD Mens principal -->
+        <div class="header-stats">
+            <div class="stat-item level">
+                <i class="fas fa-star"></i>
+                <span id="menu-level-val">LV 1</span>
+            </div>
+            <div class="stat-item coins">
+                <img src="assets/Pierocoin.webp" alt="PieroCoins">
+                <span id="menu-coins-val">0</span>
+            </div>
+        </div>
+
+        <!-- Social Badge -->
+        <div id="user-profile-badge">
+            <div class="user-avatar-container" id="user-pfp-container">
+                <!-- Dinámico -->
+            </div>
+            <div class="user-info-text">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 2px;">
+                    <span class="user-name-display" id="user-name-label">Nombre</span>
+                    <span class="user-level-tag" id="user-level-label">NIVEL 1</span>
+                </div>
+                <span class="user-record-display" id="user-record-label"><i class="fas fa-trophy"></i> Victorias:
+                    0</span>
+
+                <div class="user-xp-container">
+                    <div class="user-xp-bar" id="user-xp-progress"></div>
+                </div>
+                <div id="user-xp-text"
+                    style="font-size: 0.6rem; color: #a78bfa; font-weight: bold; margin-top: 3px; opacity: 0.8;">0 /
+                    1000 XP</div>
+            </div>
+        </div>
+
+        <!-- Menú Principal -->
+        <div id="main-menu">
+            <h1 class="menu-title">Comu Monsters</h1>
+            <p class="menu-subtitle">Duelos legendarios por turnos.</p>
+
+            <div class="menu-options">
+                <div class="menu-card" onclick="openPvP()">
+                    <i class="fas fa-swords" style="color: #ef4444;"></i>
+                    <h3>DESAFIAR</h3>
+                    <p>Duelos PvP.</p>
+                </div>
+                <div class="menu-card" onclick="startBattle('bot')">
+                    <i class="fas fa-robot"></i>
+                    <h3>IA BATTLE</h3>
+                    <p>Entrena contra la IA.</p>
+                </div>
+                <div class="menu-card" onclick="openSkills()">
+                    <i class="fas fa-book" style="color: #8b5cf6;"></i>
+                    <h3>HABILIDADES</h3>
+                    <p>Personaliza ataques.</p>
+                </div>
+                <div class="menu-card" onclick="openShop()">
+                    <i class="fas fa-shopping-bag" style="color: #10b981;"></i>
+                    <h3>TIENDA</h3>
+                    <p>Objetos y mejoras.</p>
+                </div>
+                <div class="menu-card" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i>
+                    <h3>VOLVER</h3>
+                    <p>Ir a la tienda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Batalla -->
+        <div id="battle-screen">
+            <div class="battle-scene">
+                <!-- Enemigo -->
+                <div class="opponent-area">
+                    <div class="status-card">
+                        <div class="status-header">
+                            <span id="opponent-name">Comubot</span>
+                            <span id="opponent-lv">LV 10</span>
+                        </div>
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-fill" id="opponent-hp-bar"></div>
+                        </div>
+                        <div class="hp-text" id="opponent-hp-text">100 / 100</div>
+                    </div>
+                    <div class="monster-box" id="opponent-monster">
+                        <div id="opponent-avatar-battle">
+                            <img src="assets/Comulien.webp" class="monster-img" id="opponent-img">
+                        </div>
+                        <div id="opponent-shield-visual" class="shield-effect"></div>
+                    </div>
+                </div>
+
+                <!-- Jugador -->
+                <div class="player-area">
+                    <img src="assets/michibomb.webp" id="michibomb-asset" class="michibomb-projectile">
+                    <img src="assets/fenix.png" id="fenix-asset" class="fenix-projectile">
+                    <div id="explosion-asset" class="explosion-effect"></div>
+                    <div class="monster-box" id="player-monster">
+                        <div id="player-avatar-battle"></div>
+                        <div id="player-shield-visual" class="shield-effect"></div>
+                    </div>
+                    <div class="status-card">
+                        <div class="status-header">
+                            <span id="player-name">Tú</span>
+                            <span id="player-lv">LV 1</span>
+                        </div>
+                        <div class="hp-bar-container">
+                            <div class="hp-bar-fill" id="player-hp-bar"></div>
+                        </div>
+                        <div class="hp-text" id="player-hp-text">100 / 100</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="control-panel">
+                <div class="battle-log" id="battle-log">Elige un movimiento...</div>
+                <div class="action-grid">
+                    <button class="action-btn" onclick="executeMove('attack')">Atacar</button>
+                    <button class="action-btn" onclick="executeMove('special')">Habilidad</button>
+                    <button class="action-btn" onclick="executeMove('heal')">Curar</button>
+                    <button class="action-btn" style="background: #ef4444; color: white;"
+                        onclick="endBattle()">Huir</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- PvP Modal -->
+        <div class="modal-overlay" id="pvp-modal">
+            <div class="auth-modal">
+                <h2>Desafiar Maestro</h2>
+                <p style="margin-bottom: 20px;">Busca un rival para el duelo.</p>
+                <div id="pvp-list" style="max-height: 250px; overflow-y: auto;"></div>
+                <button class="action-btn" style="width:100%; padding:10px; margin-top:15px;"
+                    onclick="closePvP()">Cerrar</button>
+            </div>
+        </div>
+
+        <!-- Tienda Modal -->
+        <div class="modal-overlay" id="shop-modal">
+            <div class="auth-modal">
+                <h2>Tienda Monsters</h2>
+                <div class="stat-item coins" style="width:fit-content; margin:10px auto;">
+                    <img src="assets/Pierocoin.webp" width="20"> <span id="shop-coins-val">0</span>
+                </div>
+                <div class="shop-grid">
+                    <div class="shop-item">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <h4>Michibomb</h4>
+                            <img src="assets/michibomb.webp" width="30" height="30"
+                                style="border-radius:5px; border:1px solid #f59e0b;">
+                        </div>
+                        <p>Desbloquea el ataque especial "¡MICHIBOMBAZO!".</p>
+                        <div class="price"><img src="assets/Pierocoin.webp" width="16"> 50</div>
+                        <button id="btn-michibomb" class="action-btn" style="font-size: 0.8rem; height:35px;"
+                            onclick="buyItem('sticker', 50, 'assets/michibomb.webp')">Comprar</button>
+                    </div>
+                </div>
+                <button class="action-btn" style="width:100%; padding:10px;" onclick="closeShop()">Cerrar</button>
+            </div>
+        </div>
+        <!-- Skills Modal (Libro) -->
+        <div class="modal-overlay" id="skills-modal">
+            <div class="book-modal">
+                <div class="book-page">
+                    <div class="book-title">Habilidades Equipadas</div>
+                    <div class="skills-container" id="equipped-skills-list">
+                        <!-- Se llena con JS -->
+                    </div>
+                </div>
+                <div class="book-page">
+                    <div class="book-title">Grimorio de Hechizos</div>
+                    <div class="skills-container" id="available-skills-list">
+                        <!-- Se llena con JS -->
+                    </div>
+                    <button class="action-btn"
+                        style="margin-top:auto; padding:10px; background:#5d4037; color:white; border-color:#3e2723;"
+                        onclick="closeSkills()">Cerrar Libro</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificación de Desafío -->
+        <div id="challenge-notification"
+            style="display:none; position: fixed; top: 20px; right: 20px; width: 300px; background: rgba(15, 23, 42, 0.95); border: 2px solid var(--accent-color); border-radius: 15px; padding: 20px; box-shadow: 0 0 30px rgba(0,0,0,0.5); z-index: 2000; animation: slideIn 0.3s ease-out;">
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">¡DESAFÍO RECIBIDO!</h3>
+            <p id="challenge-msg" style="margin-bottom: 15px; font-size: 0.9rem;">El maestro <b>User</b> te desafía.</p>
+            <div style="display: flex; gap: 10px;">
+                <button class="action-btn" style="flex: 1; padding: 8px;" onclick="acceptChallenge()">ACEPTAR</button>
+                <button class="action-btn" style="flex: 1; background: #ef4444; padding: 8px;"
+                    onclick="rejectChallenge()">RECHAZAR</button>
+            </div>
+        </div>
+        <!-- Botón de Silencio -->
+        <div id="mute-btn" onclick="toggleMute()">
+            <i id="mute-icon" class="fas fa-volume-up"></i>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBGQL-FXa6YiHuXRT0XM1HV4eTXqC0w0EA",
+            authDomain: "fenixred-10f50.firebaseapp.com",
+            databaseURL: "https://fenixred-10f50-default-rtdb.firebaseio.com",
+            projectId: "fenixred-10f50",
+            storageBucket: "fenixred-10f50.firebasestorage.app",
+            messagingSenderId: "991164964450",
+            appId: "1:991164964450:web:5320964d4b826187a37b3b",
+            measurementId: "G-7HRDGY7R5N"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        let currentUser = null;
+        let userTotalCoins = 0;
+
+        let playerHP = 100, opponentHP = 100, maxHP = 100;
+        let isPlayerTurn = true;
+        let hasMichibomb = false;
+        let playerShield = false; // Escudo Comu activo
+
+        // Sistema de Habilidades
+        let equippedSkills = ['attack', 'heal'];
+        let availableSkills = [];
+
+        // Estado PvP
+        let matchRoom = null;
+        let playerRole = null; // 'p1' (retador) o 'p2' (retado)
+        let battleMode = 'bot'; // 'bot' o 'pvp'
+        let currentChallenge = null;
+
+        const skillData = {
+            'attack': { name: 'Atacar', desc: 'Hace 15-25 de daño.', icon: 'https://cdn-icons-png.flaticon.com/512/1013/1013444.png' },
+            'heal': { name: 'Curar', desc: 'Restaura +25 de tus HP.', icon: 'https://cdn-icons-png.flaticon.com/512/883/883315.png' },
+            'michibomb': { name: 'Michibomb', desc: 'Hace 45-60 de daño.', icon: 'assets/michibomb.webp' },
+            'fenix': { name: 'Fénix Flare', desc: 'Hace 35-45 daño + cura 15.', icon: 'assets/fenix.png' },
+            'comu': { name: 'Escudo Comu', desc: 'Bloquea el próximo ataque.', icon: 'assets/Comu.webp' }
+        };
+
+        // --- SISTEMA DE AUDIO ---
+        const sounds = {
+            bgmMenu: new Audio('https://opengameart.org/sites/default/files/forest_0.mp3'),
+            bgmBattle: new Audio('https://opengameart.org/sites/default/files/forest_0.mp3'),
+            attack: new Audio('https://opengameart.org/sites/default/files/sfx_laser_2.mp3'),
+            heal: new Audio('https://opengameart.org/sites/default/files/powerup.mp3'),
+            michibomb: new Audio('https://opengameart.org/sites/default/files/explosion_0.mp3'),
+            win: new Audio('https://opengameart.org/sites/default/files/victory_fanfare.wav'),
+            click: new Audio('https://opengameart.org/sites/default/files/coin1_0.mp3'),
+            critical: new Audio('https://opengameart.org/sites/default/files/sfx_laser_1.mp3')
+        };
+
+        sounds.bgmMenu.loop = true;
+        sounds.bgmBattle.loop = true;
+        sounds.bgmMenu.volume = 0.4;
+        sounds.bgmBattle.volume = 0.2;
+
+        let isMuted = false;
+
+        function playSound(name) {
+            if (isMuted || !sounds[name]) return;
+            const s = sounds[name].cloneNode();
+            s.volume = sounds[name].volume || 0.5;
+            s.play().catch(e => { });
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            document.getElementById('mute-icon').className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+            if (isMuted) {
+                sounds.bgmMenu.pause();
+                sounds.bgmBattle.pause();
+            } else {
+                if (document.getElementById('battle-screen').style.display === 'flex') {
+                    sounds.bgmBattle.play();
+                } else {
+                    sounds.bgmMenu.play();
+                }
+            }
+        }
+
+        function switchBGM(mode) {
+            if (isMuted) return;
+            sounds.bgmMenu.pause();
+            sounds.bgmBattle.pause();
+            if (mode === 'battle') {
+                sounds.bgmBattle.currentTime = 0;
+                sounds.bgmBattle.play().catch(e => { });
+            } else {
+                sounds.bgmMenu.currentTime = 0;
+                sounds.bgmMenu.play().catch(e => { });
+            }
+        }
+
+        // Iniciar música al primer click
+        document.addEventListener('click', () => {
+            if (!isMuted && sounds.bgmMenu.paused && sounds.bgmBattle.paused) {
+                if (document.getElementById('battle-screen').style.display === 'flex') {
+                    sounds.bgmBattle.play().catch(e => { });
+                } else {
+                    sounds.bgmMenu.play().catch(e => { });
+                }
+            }
+        }, { once: true });
+
+        function checkSession() {
+            const saved = localStorage.getItem('fenixStoreUser') || sessionStorage.getItem('fenixStoreUser');
+            if (saved) {
+                currentUser = JSON.parse(saved);
+                setupUserSync();
+            } else {
+                // Redirigir a la tienda principal si no hay sesión iniciada, 
+                // ya que muchas funciones dependen de Firebase/Usuario.
+                if (confirm("Inicia sesión en Fenix Store para jugar. ¿Ir al inicio?")) {
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+
+        async function setupUserSync() {
+            if (!currentUser) return;
+
+            const userRef = database.ref('fenixstore/social/users/' + currentUser.username);
+
+            // Cargar habilidades equipadas guardadas
+            const snapshot = await userRef.once('value');
+            const data = snapshot.val();
+            if (data) {
+                // Cargar habilidades equipadas guardadas
+                if (data.equippedSkills && Array.isArray(data.equippedSkills)) {
+                    equippedSkills = data.equippedSkills;
+                }
+
+                // Cargar habilidades disponibles basadas en stickers
+                const unlockedStickers = data.unlockedStickers || [];
+                availableSkills = [];
+
+                if (unlockedStickers.includes('assets/michibomb.webp') && !equippedSkills.includes('michibomb')) {
+                    availableSkills.push('michibomb');
+                }
+                if (unlockedStickers.includes('assets/fenix.png') && !equippedSkills.includes('fenix')) {
+                    availableSkills.push('fenix');
+                }
+
+                // Habilidades Base y Regaladas
+                if (!equippedSkills.includes('attack')) availableSkills.push('attack');
+                if (!equippedSkills.includes('heal')) availableSkills.push('heal');
+                if (!equippedSkills.includes('comu')) availableSkills.push('comu');
+
+                // Renderizar botones de batalla con las habilidades cargadas
+                renderBattleButtons();
+            }
+
+            // Sincronización en tiempo real
+            userRef.on('value', snapshot => {
+                const data = snapshot.val();
+                if (data) {
+                    userTotalCoins = data.pierocoins || 0;
+                    document.getElementById('menu-level-val').textContent = `LV ${data.passLevel || 1}`;
+                    document.getElementById('menu-coins-val').textContent = userTotalCoins;
+                    document.getElementById('shop-coins-val').textContent = userTotalCoins;
+
+                    // Actualizar botones de la tienda según stickers comprados
+                    if (data.unlockedStickers) {
+                        if (data.unlockedStickers.includes('assets/michibomb.webp')) {
+                            const btn = document.getElementById('btn-michibomb');
+                            if (btn) { btn.textContent = "OBTENIDO"; btn.disabled = true; }
+                        }
+                    }
+
+                    // Controlar visibilidad del badge y HUD según el estado del juego
+                    const isBattleActive = document.getElementById('battle-screen').style.display === 'flex';
+                    document.getElementById('user-profile-badge').style.display = isBattleActive ? 'none' : 'flex';
+                    document.querySelector('.header-stats').style.display = isBattleActive ? 'none' : 'flex';
+
+                    // Actualizar elementos de la burbuja interactiva (Comu Invaders style)
+                    document.getElementById('user-name-label').textContent = currentUser.username;
+                    document.getElementById('user-level-label').textContent = `NIVEL ${data.passLevel || 1}`;
+
+                    const xp = data.passXP || 0;
+                    const level = data.passLevel || 1;
+                    const xpInLevel = xp % 1000;
+                    const xpPct = (xpInLevel / 1000) * 100;
+
+                    document.getElementById('user-xp-progress').style.width = `${xpPct}%`;
+                    document.getElementById('user-xp-text').textContent = `${xpInLevel} / 1000 XP`;
+
+                    // Obtener victorias reales de Comu Monsters para el badge
+                    const statsRef = database.ref('fenixstore/social/games/monsters/stats/' + currentUser.username);
+                    statsRef.once('value', s => {
+                        const sData = s.val();
+                        const wins = sData ? (sData.wins || 0) : 0;
+                        document.getElementById('user-record-label').innerHTML = `<i class="fas fa-trophy"></i> Victorias: ${wins}`;
+                    });
+
+                    const initials = currentUser.username.charAt(0).toUpperCase();
+                    const pfpHtml = data.avatar ? `<img src="${data.avatar}" class="user-avatar-img">` :
+                        `<div style="width:100%; height:100%; border-radius:50%; background:linear-gradient(45deg,#f59e0b,#3b82f6); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold; border: 1px solid var(--accent-color);">${initials}</div>`;
+
+                    document.getElementById('user-pfp-container').innerHTML = pfpHtml + (data.decoration ? `<img src="${data.decoration}" class="user-deco-img">` : '');
+
+                    document.getElementById('player-avatar-battle').innerHTML = `
+                        <div style="position:relative; width:160px; height:160px;">
+                            ${data.avatar ? `<img src="${data.avatar}" class="monster-pfp">` :
+                            `<div class="monster-pfp" style="width:160px; height:160px; background:linear-gradient(45deg,#f59e0b,#3b82f6); color:white; display:flex; align-items:center; justify-content:center; font-size:4rem; font-weight:bold;">${initials}</div>`
+                        }
+                            ${data.decoration ? `<img src="${data.decoration}" class="user-deco-img" style="width:190px; height:190px; top:-15px; left:-15px;">` : ''}
+                        </div>
+                    `;
+
+                    document.getElementById('player-name').textContent = currentUser.username;
+                    document.getElementById('player-lv').textContent = `LV ${data.passLevel || 1}`;
+
+                    // Verificar Stickers Especiales
+                    hasMichibomb = data.unlockedStickers && data.unlockedStickers.includes('assets/michibomb.webp');
+                    const hasFenix = data.unlockedStickers && (data.unlockedStickers.includes('assets/fenix.png') || data.unlockedStickers.includes('assets/FENIX.webp'));
+
+                    // Sincronizar Grimorio (Solo añadir si no están ya en alguna lista)
+                    if (hasMichibomb && !equippedSkills.includes('michibomb') && !availableSkills.includes('michibomb')) {
+                        availableSkills.push('michibomb');
+                    }
+                    if (hasFenix && !equippedSkills.includes('fenix') && !availableSkills.includes('fenix')) {
+                        availableSkills.push('fenix');
+                    }
+
+                    const btnMichi = document.getElementById('btn-michibomb');
+                    if (hasMichibomb && btnMichi) {
+                        btnMichi.textContent = "OBTENIDO"; btnMichi.disabled = true;
+                        btnMichi.style.background = "#4ade80"; btnMichi.style.color = "#064e3b";
+                    }
+
+                    renderBattleButtons();
+                }
+            });
+
+            // Escuchar desafíos entrantes
+            listenForChallenges();
+        }
+
+        function listenForChallenges() {
+            if (!currentUser) return;
+            const challengeRef = database.ref('fenixstore/social/games/monsters/challenges/' + currentUser.username);
+
+            challengeRef.on('value', snap => {
+                const challenge = snap.val();
+                if (challenge && challenge.status === 'pending') {
+                    currentChallenge = challenge;
+                    document.getElementById('challenge-msg').innerHTML = `El maestro <b>${challenge.challenger}</b> te ha desafiado a un duelo épico.`;
+                    document.getElementById('challenge-notification').style.display = 'block';
+                } else if (!challenge) {
+                    document.getElementById('challenge-notification').style.display = 'none';
+                }
+            });
+        }
+
+        async function acceptChallenge() {
+            if (!currentChallenge) return;
+            const challengeRef = database.ref('fenixstore/social/games/monsters/challenges/' + currentUser.username);
+            const roomId = currentChallenge.roomId;
+            const challenger = currentChallenge.challenger;
+
+            await challengeRef.update({ status: 'accepted' });
+            document.getElementById('challenge-notification').style.display = 'none';
+            // El retador ya creó la sala, pero nos aseguramos
+            await initializePvPRoom(roomId, challenger, currentUser.username);
+            startBattle('pvp', challenger, roomId, 'p2');
+
+            // Limpiar desafío después de un momento
+            setTimeout(() => challengeRef.remove(), 2000);
+        }
+
+        async function rejectChallenge() {
+            if (!currentChallenge) return;
+            const challengeRef = database.ref('fenixstore/social/games/monsters/challenges/' + currentUser.username);
+            await challengeRef.update({ status: 'rejected' });
+            document.getElementById('challenge-notification').style.display = 'none';
+            setTimeout(() => challengeRef.remove(), 1000);
+        }
+
+        async function initializePvPRoom(roomId, p1, p2) {
+            const roomRef = database.ref('fenixstore/social/games/monsters/rooms/' + roomId);
+            const snapshot = await roomRef.once('value');
+            if (!snapshot.exists()) {
+                await roomRef.set({
+                    p1: p1,
+                    p2: p2,
+                    p1_hp: 100,
+                    p2_hp: 100,
+                    p1_shield: false,
+                    p2_shield: false,
+                    turn: 'p1',
+                    lastAction: null,
+                    status: 'waiting',
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        function renderBattleButtons() {
+            const grid = document.querySelector('.action-grid');
+            let html = '';
+            equippedSkills.forEach(sId => {
+                const s = skillData[sId];
+                html += `<button class="action-btn" onclick="executeMove('${sId}')">${s.name}</button>`;
+            });
+            // Rellenar con botones vacíos si hay menos de 3 habilidades para mantener el 2x2 (Huir siempre es el 4to)
+            for (let i = equippedSkills.length; i < 3; i++) {
+                html += `<button class="action-btn" disabled style="opacity:0.3">?</button>`;
+            }
+            html += `<button class="action-btn" style="background: #ef4444; color: white;" onclick="endBattle()">Huir</button>`;
+            grid.innerHTML = html;
+        }
+
+        function startBattle(mode, oppName = "Comubot", roomId = null, role = null) {
+            if (!currentUser) return alert("Inicia sesión.");
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('battle-screen').style.display = 'flex';
+            document.getElementById('user-profile-badge').style.display = 'none';
+            document.querySelector('.header-stats').style.display = 'none';
+
+            battleMode = mode;
+            matchRoom = roomId;
+            playerRole = role;
+
+            document.querySelectorAll('.action-btn').forEach(b => {
+                b.disabled = true; // Desactivar hasta que se sincronice el estado real
+            });
+
+            if (mode === 'bot') {
+                isPlayerTurn = true;
+                document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+                document.getElementById('opponent-name').textContent = "Comubot";
+                document.getElementById('opponent-img').style.display = 'block';
+                document.getElementById('opponent-img').src = "assets/Comulien.webp";
+                document.getElementById('opponent-avatar-battle').innerHTML = `<img src="assets/Comulien.webp" class="monster-img" id="opponent-img">`;
+                log("¡Tu turno!");
+            } else {
+                document.getElementById('opponent-name').textContent = oppName;
+                setupOpponentSync(oppName);
+                if (roomId) setupPvPSync(roomId);
+                log("Sincronizando batalla...");
+            }
+
+            switchBGM('battle');
+        }
+
+        function setupPvPSync(roomId) {
+            const roomRef = database.ref('fenixstore/social/games/monsters/rooms/' + roomId);
+            roomRef.on('value', snap => {
+                const room = snap.val();
+                if (!room) return;
+
+                // Sync turn
+                isPlayerTurn = (room.turn === playerRole && room.status === 'active');
+                document.querySelectorAll('.action-btn').forEach(b => {
+                    b.disabled = !isPlayerTurn;
+                });
+
+                if (room.status === 'waiting') {
+                    log("Esperando a que el rival acepte...");
+                } else if (room.status === 'active') {
+                    if (isPlayerTurn) log("¡Tu turno!");
+                    else log("Turno del oponente...");
+                } else if (room.status === 'rejected') {
+                    log("El oponente rechazó el duelo.");
+                    setTimeout(endBattle, 3000);
+                }
+
+                // Sync HP y Shields
+                const myHP = playerRole === 'p1' ? room.p1_hp : room.p2_hp;
+                const herHP = playerRole === 'p1' ? room.p2_hp : room.p1_hp;
+                const herShield = playerRole === 'p1' ? room.p2_shield : room.p1_shield;
+
+                playerHP = myHP; opponentHP = herHP;
+                updateHP('player', playerHP);
+                updateHP('opponent', opponentHP);
+
+                // Efecto visual de escudo del oponente
+                const oppShieldVisual = document.getElementById('opponent-shield-visual');
+                if (oppShieldVisual) oppShieldVisual.style.display = herShield ? 'block' : 'none';
+
+                // Detectar última acción del oponente para animar
+                if (room.lastAction && room.lastAction.by !== playerRole) {
+                    executeRemoteAction(room.lastAction);
+                    // Limpiar acción después de procesarla (solo el que no la hizo)
+                    roomRef.update({ lastAction: null });
+                }
+
+                if (room.status === 'finished') {
+                    roomRef.off();
+                }
+            });
+        }
+
+        function executeRemoteAction(act) {
+            const o = document.getElementById('opponent-monster'), p = document.getElementById('player-monster');
+            log(`El oponente usó ${skillData[act.type].name}.`);
+
+            if (act.type === 'attack' || act.type === 'michibomb' || act.type === 'fenix') {
+                playSound(act.type === 'michibomb' ? 'michibomb' : 'attack');
+                o.classList.add('anim-attack');
+                p.classList.add('anim-shake');
+                setTimeout(() => {
+                    o.classList.remove('anim-attack');
+                    p.classList.remove('anim-shake');
+                }, 600);
+            } else if (act.type === 'heal') {
+                // Animación de cura si existiera
+            }
+        }
+
+        async function setupOpponentSync(username) {
+            const snap = await database.ref('fenixstore/social/users/' + username).once('value');
+            const data = snap.val();
+            if (data) {
+                document.getElementById('opponent-lv').textContent = `LV ${data.passLevel || 1}`;
+
+                const initials = username.charAt(0).toUpperCase();
+                const pfpHtml = data.avatar ? `<img src="${data.avatar}" class="monster-pfp" style="border-radius: 50%;">` :
+                    `<div class="monster-pfp" style="width:160px; height:160px; border-radius:50%; background:linear-gradient(45deg,#f59e0b,#3b82f6); color:white; display:flex; align-items:center; justify-content:center; font-size:4rem; font-weight:bold; border: 5px solid white;">${initials}</div>`;
+
+                const decoHtml = data.decoration ?
+                    `<img src="${data.decoration}" style="width:190px; height:190px; top:-15px; left:-15px;">` : '';
+
+                document.getElementById('opponent-avatar-battle').innerHTML = `
+                    <div style="position:relative; width:160px; height:160px;">
+                        ${pfpHtml}
+                        ${decoHtml}
+                    </div>
+                `;
+            }
+        }
+
+
+
+        function endBattle() {
+            // Limpiar listeners de PvP al salir
+            if (matchRoom) {
+                database.ref('fenixstore/social/games/monsters/rooms/' + matchRoom).off();
+                matchRoom = null;
+            }
+            battleMode = 'bot';
+
+            document.getElementById('main-menu').style.display = 'flex';
+            document.getElementById('battle-screen').style.display = 'none';
+            document.getElementById('user-profile-badge').style.display = 'flex';
+            document.querySelector('.header-stats').style.display = 'flex';
+
+            switchBGM('menu');
+        }
+
+        function updateHP(target, val) {
+            const bar = document.getElementById(`${target}-hp-bar`);
+            const text = document.getElementById(`${target}-hp-text`);
+            const pct = (val / maxHP) * 100;
+            bar.style.width = `${pct}%`;
+            text.textContent = `${Math.max(0, val)} / ${maxHP}`;
+            bar.style.background = pct > 50 ? 'var(--hp-green)' : (pct > 20 ? 'var(--hp-yellow)' : 'var(--hp-red)');
+            if (val <= 0) setTimeout(() => finishBattle(target === 'opponent'), 800);
+        }
+
+        async function executeMove(type) {
+            if (!isPlayerTurn) return;
+            isPlayerTurn = false;
+            document.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+
+            const p = document.getElementById('player-monster'), o = document.getElementById('opponent-monster');
+
+            let dmg = 0, h = 0, effect = null;
+
+            if (type === 'attack') {
+                playSound('attack');
+                p.classList.add('anim-attack');
+                dmg = 15 + Math.floor(Math.random() * 10);
+                log(`Atacaste e hiciste ${dmg} de daño.`);
+                o.classList.add('anim-shake');
+                setTimeout(() => {
+                    p.classList.remove('anim-attack'); o.classList.remove('anim-shake');
+                    processMoveResult(type, dmg, 0);
+                }, 600);
+            } else if (type === 'michibomb') {
+                const bomb = document.getElementById('michibomb-asset');
+                const expl = document.getElementById('explosion-asset');
+                bomb.classList.add('anim-michibomb');
+                log("¡LANZASTE UNA MICHIBOMBA!");
+                setTimeout(() => {
+                    bomb.classList.remove('anim-michibomb');
+                    dmg = 45 + Math.floor(Math.random() * 15);
+                    log(`¡BOOM! El Michibomb causó ${dmg} de daño.`);
+                    expl.style.left = "600px"; expl.style.top = "180px";
+                    expl.classList.add('anim-explode'); o.classList.add('anim-shake');
+                    playSound('michibomb');
+                    setTimeout(() => {
+                        expl.classList.remove('anim-explode'); o.classList.remove('anim-shake');
+                        processMoveResult(type, dmg, 0);
+                    }, 500);
+                }, 800);
+            } else if (type === 'fenix') {
+                const fenix = document.getElementById('fenix-asset');
+                const expl = document.getElementById('explosion-asset');
+                fenix.classList.add('anim-fenix');
+                log("¡EL FÉNIX RENACE!");
+                setTimeout(() => {
+                    fenix.classList.remove('anim-fenix');
+                    dmg = 35 + Math.floor(Math.random() * 10);
+                    h = 15;
+                    log(`¡Fenix Flare! ${dmg} daño y +${h} curación.`);
+                    expl.style.left = "600px"; expl.style.top = "180px";
+                    expl.classList.add('anim-explode'); o.classList.add('anim-shake');
+                    playSound('attack');
+                    setTimeout(() => {
+                        expl.classList.remove('anim-explode'); o.classList.remove('anim-shake');
+                        processMoveResult(type, dmg, h);
+                    }, 500);
+                }, 1200);
+            } else if (type === 'heal') {
+                h = 25;
+                log(`Curaste ${h} HP.`);
+                playSound('heal');
+                processMoveResult(type, 0, h);
+            } else if (type === 'comu') {
+                playerShield = true;
+                playSound('heal'); // Reuse heal sound for shield activation
+                document.getElementById('player-shield-visual').style.display = 'block';
+                log("¡Has activado el ESCUDO COMU!");
+                processMoveResult(type, 0, 0, true);
+            }
+        }
+
+        async function processMoveResult(type, dmg, heal, setShield = false) {
+            if (battleMode === 'bot') {
+                opponentHP -= dmg;
+                playerHP = Math.min(maxHP, playerHP + heal);
+                updateHP('player', playerHP);
+                updateHP('opponent', opponentHP);
+                if (opponentHP > 0) setTimeout(botTurn, 1000);
+            } else {
+                // MODO PVP: Sincronizar con Firebase
+                const roomRef = database.ref('fenixstore/social/games/monsters/rooms/' + matchRoom);
+                const snap = await roomRef.once('value');
+                const room = snap.val();
+
+                let updates = {};
+                const oppPrefix = playerRole === 'p1' ? 'p2' : 'p1';
+                const myPrefix = playerRole === 'p1' ? 'p1' : 'p2';
+
+                // Aplicar Daño (verificar escudo oponente)
+                const oppShield = room[oppPrefix + '_shield'];
+                if (dmg > 0) {
+                    if (oppShield) {
+                        updates[oppPrefix + '_shield'] = false;
+                        log("¡El oponente bloqueó tu ataque!");
+                    } else {
+                        updates[oppPrefix + '_hp'] = Math.max(0, room[oppPrefix + '_hp'] - dmg);
+                    }
+                }
+
+                // Aplicar Cura y Escudo propio
+                if (heal > 0) updates[myPrefix + '_hp'] = Math.min(100, (room[myPrefix + '_hp'] || 100) + heal);
+                if (setShield) updates[myPrefix + '_shield'] = true;
+
+                // Cambiar turno
+                updates['turn'] = playerRole === 'p1' ? 'p2' : 'p1';
+                updates['lastAction'] = { by: playerRole, type: type, ts: Date.now() };
+
+                await roomRef.update(updates);
+            }
+        }
+
+        function botTurn() {
+            if (battleMode === 'pvp') return; // En PvP no hay botTurn
+            if (opponentHP <= 0) return;
+            setTimeout(() => {
+                const o = document.getElementById('opponent-monster'), p = document.getElementById('player-monster');
+                let action = 'attack';
+
+                // Estrategia del Bot
+                if (opponentHP < 40 && Math.random() > 0.4) {
+                    action = 'heal';
+                } else if (Math.random() > 0.7) {
+                    action = 'special';
+                }
+
+                if (action === 'heal') {
+                    // Bot se cura
+                    let h = 20 + Math.floor(Math.random() * 10);
+                    opponentHP = Math.min(maxHP, opponentHP + h);
+                    updateHP('opponent', opponentHP);
+                    log(`El rival usó Recuperación y curó ${h} HP.`);
+                } else if (action === 'special') {
+                    // Bot usa ataque potente
+                    o.classList.add('anim-attack-opponent');
+                    let dmg = 25 + Math.floor(Math.random() * 15);
+
+                    if (playerShield) {
+                        dmg = 0;
+                        playerShield = false;
+                        document.getElementById('player-shield-visual').style.display = 'none';
+                        log("¡EL ESCUDO COMU HA BLOQUEADO EL ATAQUE!");
+                    } else {
+                        playerHP -= dmg;
+                        updateHP('player', playerHP);
+                        p.classList.add('anim-shake');
+                        log(`¡CRÍTICO! El rival usó Hiperrayo e hizo ${dmg} de daño.`);
+                    }
+                } else {
+                    // Bot ataca normal
+                    o.classList.add('anim-attack-opponent');
+                    let dmg = 15 + Math.floor(Math.random() * 12);
+
+                    if (playerShield) {
+                        dmg = 0;
+                        playerShield = false;
+                        document.getElementById('player-shield-visual').style.display = 'none';
+                        log("¡EL ESCUDO COMU HA BLOQUEADO EL ATAQUE!");
+                    } else {
+                        playerHP -= dmg;
+                        updateHP('player', playerHP);
+                        p.classList.add('anim-shake');
+                        log(`El rival atacó e hizo ${dmg} de daño.`);
+                    }
+                }
+
+                setTimeout(() => {
+                    o.classList.remove('anim-attack-opponent');
+                    p.classList.remove('anim-shake');
+                    if (playerHP > 0) {
+                        isPlayerTurn = true;
+                        document.querySelectorAll('.action-btn').forEach(b => b.disabled = false);
+                    }
+                }, 600);
+            }, 1000);
+        }
+
+        async function finishBattle(won) {
+            if (won) {
+                const rewardCoins = Math.floor(Math.random() * 3) + 3; // 3 a 5 monedas
+                const logMsg = `¡VICTORIA! +100 XP, +${rewardCoins} <img src="assets/Pierocoin.webp" width="20" style="vertical-align:middle; margin:0 3px;"> PieroCoins`;
+                document.getElementById('battle-log').innerHTML = logMsg;
+
+                if (currentUser) {
+                    database.ref('fenixstore/social/users/' + currentUser.username).transaction(d => {
+                        if (d) {
+                            d.passXP = (d.passXP || 0) + 100;
+                            d.pierocoins = (d.pierocoins || 0) + rewardCoins;
+                            d.passLevel = Math.floor(d.passXP / 1000) + 1;
+                        }
+                        return d;
+                    });
+                }
+            } else {
+                log("HAS SIDO DERROTADO...");
+            }
+
+            // Limpiar sala si es PvP
+            if (battleMode === 'pvp' && matchRoom) {
+                const roomRef = database.ref('fenixstore/social/games/monsters/rooms/' + matchRoom);
+                if (won) {
+                    await roomRef.update({ status: 'finished', winner: currentUser.username });
+                }
+            }
+
+            setTimeout(async () => {
+                if (currentUser) {
+                    await saveBattleStats(won);
+                    if (won) {
+                        if (confirm("¡Victoria! ¿Quieres compartirla en el muro social?")) {
+                            shareVictory();
+                        }
+                    }
+                }
+                endBattle();
+            }, 1500);
+            if (won) playSound('win');
+        }
+
+        // Guardar estadísticas de batalla en Firebase
+        async function saveBattleStats(won) {
+            if (!currentUser) return;
+
+            const statsRef = database.ref('fenixstore/social/games/monsters/stats/' + currentUser.username);
+
+            try {
+                await statsRef.transaction(stats => {
+                    if (!stats) {
+                        stats = {
+                            wins: 0,
+                            losses: 0,
+                            currentStreak: 0,
+                            bestStreak: 0,
+                            totalBattles: 0
+                        };
+                    }
+
+                    stats.totalBattles = (stats.totalBattles || 0) + 1;
+
+                    if (won) {
+                        stats.wins = (stats.wins || 0) + 1;
+                        stats.currentStreak = (stats.currentStreak || 0) + 1;
+                        stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
+                    } else {
+                        stats.losses = (stats.losses || 0) + 1;
+                        stats.currentStreak = 0;
+                    }
+
+                    return stats;
+                });
+
+                // Actualizar ranking si ganó
+                if (won) {
+                    const rankingRef = database.ref('fenixstore/social/games/monsters/ranking/' + currentUser.username);
+                    const snapshot = await rankingRef.once('value');
+                    const currentWins = snapshot.val() || 0;
+
+                    // Guardar el nuevo total de victorias
+                    const statsSnapshot = await statsRef.once('value');
+                    const statsData = statsSnapshot.val();
+                    if (statsData && statsData.wins > currentWins) {
+                        await rankingRef.set(statsData.wins);
+                    }
+                }
+            } catch (error) {
+                console.error('Error guardando estadísticas:', error);
+            }
+        }
+
+        // Compartir victoria en el muro social
+        async function shareVictory() {
+            if (!currentUser || !currentUser.username) {
+                alert('Debes estar logueado para compartir.');
+                return;
+            }
+
+            try {
+                // Obtener estadísticas actuales
+                const statsRef = database.ref('fenixstore/social/games/monsters/stats/' + currentUser.username);
+                const statsSnap = await statsRef.once('value');
+                const stats = statsSnap.val() || { wins: 0, currentStreak: 0, bestStreak: 0 };
+
+                // Obtener datos del usuario
+                const userSnap = await database.ref('fenixstore/social/users/' + currentUser.username).once('value');
+                const userData = userSnap.val() || {};
+                const avatarUrl = userData.avatar || null;
+                const decoration = userData.decoration || '';
+
+                const postId = database.ref('fenixstore/social/posts').push().key;
+                const initials = currentUser.username.charAt(0).toUpperCase();
+
+                const avatarHtml = avatarUrl ?
+                    `<img src="${avatarUrl}" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #f59e0b; display: block;">` :
+                    `<div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(45deg, #f59e0b, #f97316); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; border: 2px solid #f59e0b;">${initials}</div>`;
+
+                const cardHtml = `
+                    <div class="victory-card-social" style="background: #111827; border: 2px solid #f59e0b; border-radius: 16px; padding: 20px; color: white; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; font-family: sans-serif; max-width: 400px; margin: 10px auto; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);">
+                        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #f59e0b; font-weight: bold; opacity: 0.9;">Victoria en Comu Monsters</div>
+                        <div style="position: relative; width: 70px; height: 70px; margin: 5px 0;">
+                            ${avatarHtml}
+                            ${decoration ? `<img src="${decoration}" style="position: absolute; top: -8px; left: -8px; width: 86px; height: 86px; pointer-events: none; z-index: 10; max-width: none;">` : ''}
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <div style="font-size: 18px; font-weight: 700; color: #f9fafb;">${currentUser.username}</div>
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 8px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 800; color: #10b981;">${stats.wins}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">VICTORIAS</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: 800; color: #f59e0b;">🔥${stats.currentStreak}</div>
+                                    <div style="font-size: 11px; opacity: 0.7;">RACHA</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(255, 255, 255, 0.05); padding: 8px 15px; border-radius: 10px; font-size: 13px; line-height: 1.4; color: #d1d5db;">
+                            ¡Acabo de ganar otra batalla épica! ¿Quién se atreve a desafiarme? ⚔️🔥
+                        </div>
+                    </div>
+                `;
+
+                const postData = {
+                    id: postId,
+                    author: currentUser.username,
+                    text: `¡Victoria en Comu Monsters! ⚔️ Acabo de ganar otra batalla épica. Llevo ${stats.wins} victorias y una racha de ${stats.currentStreak} 🔥 ¡Ven a desafiarme! #Gaming #FenixStore #ComuMonsters`,
+                    image: '',
+                    gameCard: cardHtml,
+                    timestamp: Date.now(),
+                    likes: 0,
+                    comments: 0
+                };
+
+                await database.ref('fenixstore/social/posts/' + postId).set(postData);
+                alert('¡Victoria compartida con éxito en el muro social!');
+
+            } catch (error) {
+                console.error('Error compartiendo victoria:', error);
+                alert('Hubo un error al compartir. Asegúrate de estar logueado.');
+            }
+        }
+
+        function openPvP() {
+            document.getElementById('pvp-modal').classList.add('active');
+            const list = document.getElementById('pvp-list'); list.innerHTML = "Buscando...";
+            database.ref('fenixstore/social/users').limitToLast(10).once('value', s => {
+                list.innerHTML = "";
+                const users = s.val() || {};
+                Object.keys(users).forEach(u => {
+                    if (u === currentUser.username) return;
+                    const userData = users[u];
+                    const initials = u.charAt(0).toUpperCase();
+                    const pfpHtml = userData.avatar ?
+                        `<img src="${userData.avatar}" style="width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent-color); object-fit: cover;">` :
+                        `<div style="width: 35px; height: 35px; border-radius: 50%; background: linear-gradient(45deg, #f59e0b, #3b82f6); color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">${initials}</div>`;
+
+                    const decoHtml = userData.decoration ?
+                        `<img src="${userData.decoration}" style="position: absolute; top: -4px; left: -4px; width: 43px; height: 43px; pointer-events: none; z-index: 2;">` : '';
+
+                    const div = document.createElement('div');
+                    div.style.cssText = "display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);";
+                    div.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position: relative; width: 35px; height: 35px;">
+                                ${pfpHtml}
+                                ${decoHtml}
+                            </div>
+                            <span style="font-weight:600;">${u}</span>
+                        </div>
+                        <button class="action-btn" style="padding:5px 15px; font-size:0.8rem;" onclick="sendMatchChallenge('${u}')">RETAR</button>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        async function sendMatchChallenge(targetName) {
+            closePvP();
+            const roomId = currentUser.username + "_" + targetName + "_" + Date.now();
+            const challengeRef = database.ref('fenixstore/social/games/monsters/challenges/' + targetName);
+
+            // 1. Inicializar la sala en modo espera
+            await initializePvPRoom(roomId, currentUser.username, targetName);
+
+            // 2. Entrar a la batalla inmediatamente
+            startBattle('pvp', targetName, roomId, 'p1');
+
+            log(`Enviando desafío a ${targetName}...`);
+            await challengeRef.set({
+                challenger: currentUser.username,
+                roomId: roomId,
+                status: 'pending'
+            });
+
+            // 3. Escuchar respuesta del desafío
+            const roomRef = database.ref('fenixstore/social/games/monsters/rooms/' + roomId);
+            challengeRef.on('value', async snap => {
+                const val = snap.val();
+                if (val && val.status === 'accepted') {
+                    challengeRef.off();
+                    // Cambiar estado de sala a activo
+                    await roomRef.update({ status: 'active' });
+                } else if (val && val.status === 'rejected') {
+                    challengeRef.off();
+                    await roomRef.update({ status: 'rejected' });
+                    // No removemos aquí, dejamos que setupPvPSync lo maneje para mostrar el log
+                }
+            });
+
+            // Timeout de desafío (45s)
+            setTimeout(async () => {
+                const snap = await challengeRef.once('value');
+                if (snap.exists() && snap.val().status === 'pending') {
+                    challengeRef.off();
+                    challengeRef.remove();
+                    await roomRef.update({ status: 'rejected' });
+                    log("El desafío ha expirado.");
+                }
+            }, 45000);
+        }
+        function closePvP() { document.getElementById('pvp-modal').classList.remove('active'); }
+        function openShop() { document.getElementById('shop-modal').classList.add('active'); }
+        function closeShop() { document.getElementById('shop-modal').classList.remove('active'); }
+        function log(m) { document.getElementById('battle-log').textContent = m; }
+
+        async function buyItem(it, pr, path = null) {
+            if (!currentUser) return;
+            if (userTotalCoins < pr) return alert("No tienes suficientes PieroCoins.");
+
+            // Si es un sticker, verificar si ya se tiene antes de cobrar
+            if (it === 'sticker' && path) {
+                const snap = await database.ref('fenixstore/social/users/' + currentUser.username + '/unlockedStickers').once('value');
+                const unlocked = snap.val() || [];
+                if (unlocked.includes(path)) {
+                    alert("¡Ya tienes este objeto!");
+                    return;
+                }
+            }
+
+            await database.ref('fenixstore/social/users/' + currentUser.username).transaction(d => {
+                if (d && (d.pierocoins || 0) >= pr) {
+                    d.pierocoins -= pr;
+                    if (it === 'max_hp') d.battle_max_hp = (d.battle_max_hp || 100) + 20;
+                    if (it === 'sticker' && path) {
+                        if (!d.unlockedStickers) d.unlockedStickers = [];
+                        if (!d.unlockedStickers.includes(path)) d.unlockedStickers.push(path);
+                    }
+                    return d;
+                }
+            });
+            alert("¡Compra exitosa!");
+        }
+
+        // Función especial para devolver monedas por el error (Refund)
+        async function refundError() {
+            if (!currentUser) return;
+            // Solo reembolsamos si el flag de devuelto no existe para evitar duplicados
+            const snap = await database.ref('fenixstore/social/users/' + currentUser.username + '/refunded_bug_100').once('value');
+            if (!snap.exists()) {
+                await database.ref('fenixstore/social/users/' + currentUser.username).transaction(d => {
+                    if (d) {
+                        d.pierocoins = (d.pierocoins || 0) + 100;
+                        d.refunded_bug_100 = true; // Evitar que se ejecute más de una vez
+                    }
+                    return d;
+                });
+                console.log("Reembolso de 100 monedas procesado correctamente.");
+            }
+        }
+
+        // Ejecutamos el reembolso al cargar la sesión
+        setTimeout(refundError, 2000);
+
+        function openSkills() {
+            document.getElementById('skills-modal').classList.add('active');
+            renderBookSkills();
+        }
+
+        function closeSkills() {
+            document.getElementById('skills-modal').classList.remove('active');
+        }
+
+        // Actualizar lista de habilidades disponibles basándose en equipadas
+        async function updateAvailableSkills() {
+            if (!currentUser) return;
+
+            const snapshot = await database.ref('fenixstore/social/users/' + currentUser.username).once('value');
+            const data = snapshot.val();
+            if (data) {
+                const unlockedStickers = data.unlockedStickers || [];
+                availableSkills = [];
+
+                // Solo agregar a disponibles si no está equipada
+                if (unlockedStickers.includes('assets/michibomb.webp') && !equippedSkills.includes('michibomb')) {
+                    availableSkills.push('michibomb');
+                }
+                if (unlockedStickers.includes('assets/fenix.png') && !equippedSkills.includes('fenix')) {
+                    availableSkills.push('fenix');
+                }
+
+                // Habilidades Base y Regaladas siempre disponibles si no están equipadas
+                if (!equippedSkills.includes('attack')) availableSkills.push('attack');
+                if (!equippedSkills.includes('heal')) availableSkills.push('heal');
+                if (!equippedSkills.includes('comu')) availableSkills.push('comu');
+            }
+        }
+
+        function renderBookSkills() {
+            const equippedList = document.getElementById('equipped-skills-list');
+            const availableList = document.getElementById('available-skills-list');
+
+            // Renderizar Equipadas (Máximo 3)
+            equippedList.innerHTML = "";
+            for (let i = 0; i < 3; i++) {
+                const sId = equippedSkills[i];
+                if (sId) {
+                    const s = skillData[sId];
+                    const btn = document.createElement('button');
+                    btn.className = "action-btn";
+                    btn.style.cssText = "height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; gap: 2px; overflow: hidden;";
+                    btn.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <img src="${s.icon}" width="18" height="18" style="object-fit:contain;">
+                            <span style="font-size: 0.75rem; font-weight:800;">${s.name}</span>
+                        </div>
+                        <span style="font-size: 0.55rem; opacity: 0.8; font-weight:400; text-transform:none; line-height:1;">${s.desc}</span>
+                    `;
+                    btn.onclick = () => unequipSkill(sId);
+                    equippedList.appendChild(btn);
+                } else {
+                    const empty = document.createElement('button');
+                    empty.className = "action-btn";
+                    empty.style.cssText = "height: 80px; width: 100%; opacity: 0.2;";
+                    empty.disabled = true;
+                    empty.textContent = "?";
+                    equippedList.appendChild(empty);
+                }
+            }
+
+            // Renderizar Grimorio (Disponibles)
+            availableList.innerHTML = "";
+            for (let i = 0; i < 6; i++) {
+                const sId = availableSkills[i];
+                if (sId) {
+                    const s = skillData[sId];
+                    const btn = document.createElement('button');
+                    btn.className = "action-btn";
+                    btn.style.cssText = "height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5px; gap: 2px; overflow: hidden;";
+                    btn.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <img src="${s.icon}" width="18" height="18" style="object-fit:contain;">
+                            <span style="font-size: 0.75rem; font-weight:800;">${s.name}</span>
+                        </div>
+                        <span style="font-size: 0.55rem; opacity: 0.8; font-weight:400; text-transform:none; line-height:1;">${s.desc}</span>
+                    `;
+                    btn.onclick = () => equipSkill(sId);
+                    availableList.appendChild(btn);
+                } else {
+                    const empty = document.createElement('button');
+                    empty.className = "action-btn";
+                    empty.style.cssText = "height: 80px; width: 100%; opacity: 0.2;";
+                    empty.disabled = true;
+                    empty.textContent = "?";
+                    availableList.appendChild(empty);
+                }
+            }
+        }
+
+        async function equipSkill(sId) {
+            if (equippedSkills.length >= 3) return alert("¡Máximo 3 habilidades equipadas!");
+            equippedSkills.push(sId);
+            await updateAvailableSkills();
+            saveEquippedSkills();
+            renderBookSkills();
+            renderBattleButtons();
+        }
+
+        async function unequipSkill(sId) {
+            if (equippedSkills.length <= 1) return alert("¡Debes tener al menos 1 habilidad!");
+            equippedSkills = equippedSkills.filter(id => id !== sId);
+            await updateAvailableSkills();
+            saveEquippedSkills();
+            renderBookSkills();
+            renderBattleButtons();
+        }
+
+        // Guardar habilidades equipadas en Firebase
+        function saveEquippedSkills() {
+            if (!currentUser) return;
+            database.ref('fenixstore/social/users/' + currentUser.username).update({
+                equippedSkills: equippedSkills
+            }).catch(err => console.error('Error guardando habilidades:', err));
+        }
+
+        // Sincronizar logout entre pestañas
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'fenixStoreUser' && !e.newValue) {
+                location.reload();
+            }
+        });
+
+        checkSession();
+    </script>
+</body>
+
+</html>
